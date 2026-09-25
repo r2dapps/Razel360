@@ -39,7 +39,11 @@ assert(htmlContent.includes('rel="icon" type="image/svg+xml"'), 'Inline SVG VR C
 assert(htmlContent.includes('three.min.js'), 'Three.js library is included');
 assert(htmlContent.includes('id="crosshair-reticle"'), 'Permanent navigation crosshair element exists');
 assert(htmlContent.includes('id="canvas-container"'), 'Canvas container element exists');
-assert(htmlContent.includes('id="btn-auto-demo"'), 'Automated Guided Demo button exists');
+assert(htmlContent.includes('id="initial-preloader"'), 'Initial loading spinner is implemented');
+assert(!htmlContent.includes('<p class="text-[8px] md:text-[9px] text-slate-400 font-medium">Virtual Tour</p>'), 'Redundant Virtual Tour tagline removed for minimalist UI');
+assert(htmlContent.includes('id="modal-settings"'), 'Settings modal for consolidated controls is implemented');
+assert(htmlContent.includes('toggleBottomStripCollapse'), 'Collapsible room strip toggle is implemented');
+assert(htmlContent.includes('bindTouchGestures'), 'Touch gesture pinch-to-zoom is implemented');
 
 // 2. Mobile Responsiveness Checks
 console.log('\n\x1b[36m[2/6] Validating Mobile Responsiveness Meta & CSS...\x1b[0m');
@@ -65,8 +69,10 @@ assert(syntaxOk, 'JavaScript syntax parses cleanly without errors');
 assert(scriptCode.includes('playPopSound'), 'Web Audio API pop chime synthesizer is implemented');
 assert(scriptCode.includes('playWhooshSound'), 'Web Audio API doorway transition whoosh synthesizer is implemented');
 assert(scriptCode.includes('toggleAutoDemo'), 'Automated guided walkthrough demo engine is implemented');
-assert(scriptCode.includes('create3DPortalDoorstepMesh'), 'Google Street View style floor doorstep ring disc is implemented');
-assert(scriptCode.includes('create3DCalloutMesh'), 'Small dot beacon with rising arrow stem callout is implemented');
+assert(scriptCode.includes('create3DPortalDoorstepMesh'), 'Upright vertical doorway portal frame mesh is implemented');
+assert(scriptCode.includes('create3DCalloutMesh'), 'Tiny dot beacon with rising arrow stem callout is implemented');
+assert(scriptCode.includes('createSeamlessTexture'), 'Seamless texture edge-blending is implemented');
+assert(scriptCode.includes('ctx.beginPath()'), 'Canvas path isolation via ctx.beginPath() prevents white background collision');
 
 // 4. Validate Demo Tour Schema & Hotspots
 console.log('\n\x1b[36m[4/6] Validating Multi-Tour Data Schema & Demo Assets...\x1b[0m');
