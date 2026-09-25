@@ -44,6 +44,15 @@ assert(!htmlContent.includes('<p class="text-[8px] md:text-[9px] text-slate-400 
 assert(htmlContent.includes('id="modal-settings"'), 'Settings modal for consolidated controls is implemented');
 assert(htmlContent.includes('toggleBottomStripCollapse'), 'Collapsible room strip toggle is implemented');
 assert(htmlContent.includes('bindTouchGestures'), 'Touch gesture pinch-to-zoom is implemented');
+assert(htmlContent.includes('id="home-start-page"'), 'Interactive 360 Home Start Page overlay is present');
+assert(htmlContent.includes('id="btn-hero-launch-vr"'), 'Floating center START VR SHOWCASE button is present');
+assert(htmlContent.includes('og:title') && htmlContent.includes('og:image'), 'Social Open Graph SEO meta tags are configured');
+assert(htmlContent.includes('twitter:card'), 'Twitter Summary Card SEO meta tags are configured');
+assert(htmlContent.includes('application/ld+json'), 'Schema.org structured JSON-LD data is configured');
+assert(htmlContent.includes('shareTour'), 'Web Share API and clipboard copy sharing engine is implemented');
+assert(htmlContent.includes('id="btn-mobile-exit-fs"'), 'Mobile exit fullscreen and UI restore floating button is implemented');
+const lobbyAssetPath = path.join(ROOT_DIR, 'assets', 'lobby', 'lobby_360.jpg');
+assert(fs.existsSync(lobbyAssetPath), 'High-resolution 360 Grand Lobby image exists at assets/lobby/lobby_360.jpg');
 
 // 2. Mobile Responsiveness Checks
 console.log('\n\x1b[36m[2/6] Validating Mobile Responsiveness Meta & CSS...\x1b[0m');
@@ -54,10 +63,10 @@ assert(htmlContent.includes('overflow-x-auto'), 'Room thumbnail strip supports h
 
 // 3. Extract & Validate Embedded JavaScript
 console.log('\n\x1b[36m[3/6] Validating JavaScript Engine & Audio Synthesizer...\x1b[0m');
-const scriptMatches = htmlContent.match(/<script>([\s\S]*?)<\/script>/);
-assert(!!scriptMatches && scriptMatches[1].length > 0, 'Embedded script block found in index.html');
+const allScripts = Array.from(htmlContent.matchAll(/<script(?:[^>]*)>([\s\S]*?)<\/script>/gi)).map(m => m[1]);
+assert(allScripts.length > 0, 'Embedded script blocks found in index.html');
 
-let scriptCode = scriptMatches[1];
+const scriptCode = allScripts.sort((a, b) => b.length - a.length)[0];
 let syntaxOk = false;
 try {
   new Function(scriptCode);
@@ -66,6 +75,9 @@ try {
   console.error('Syntax Error:', e.message);
 }
 assert(syntaxOk, 'JavaScript syntax parses cleanly without errors');
+assert(scriptCode.includes('loadLobbyScene'), 'Scene 1: Grand Architectural Lobby engine is implemented');
+assert(scriptCode.includes('enterTour') && scriptCode.includes('returnToLobby'), 'Scene 2: Seamless transition between Lobby and Studio is implemented');
+assert(scriptCode.includes('checkMobileAutoGyro'), 'Automatic mobile gyroscope detection and auto-binding is implemented');
 assert(scriptCode.includes('playPopSound'), 'Web Audio API pop chime synthesizer is implemented');
 assert(scriptCode.includes('playWhooshSound'), 'Web Audio API doorway transition whoosh synthesizer is implemented');
 assert(scriptCode.includes('toggleAutoDemo'), 'Automated guided walkthrough demo engine is implemented');

@@ -5,7 +5,58 @@
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Razel 360 | Luxury Virtual Showcase</title>
+
+  <!-- Primary SEO Meta Tags -->
+  <title>Razel 360 | Luxury Virtual Showcase & Spatial Architectural Engine</title>
+  <meta name="title" content="Razel 360 | Luxury Virtual Showcase & Spatial Architectural Engine">
+  <meta name="description"
+    content="Immersive 8K 360° virtual tour engine for high-end luxury real estate, architectural firms, and 3D visualizers. Explore Beverly Hills and French Riviera estates with Cardboard VR, specification tagging, and autonomous walkthroughs.">
+  <meta name="keywords"
+    content="360 virtual tour, luxury real estate, spatial showcase, architectural visualization, cardboard vr, matterport alternative, three.js 360, webgl tour">
+  <meta name="author" content="Razel Tech">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://r2dapps.github.io/Razel360/">
+
+  <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://r2dapps.github.io/Razel360/">
+  <meta property="og:site_name" content="Razel 360">
+  <meta property="og:title" content="Razel 360 | Luxury Virtual Showcase & Spatial Engine">
+  <meta property="og:description"
+    content="Step inside multi-million dollar architectural residences in photorealistic 8K equirectangular 3D. Interactive specification tagging, VR Cardboard mode, and instant tour studio.">
+  <meta property="og:image" content="https://r2dapps.github.io/Razel360/assets/demo/exterior.jpg">
+  <meta property="og:image:width" content="2048">
+  <meta property="og:image:height" content="1024">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://r2dapps.github.io/Razel360/">
+  <meta name="twitter:title" content="Razel 360 | Luxury Virtual Showcase & Spatial Engine">
+  <meta name="twitter:description"
+    content="Experience architectural masterpieces in interactive 360° VR with specification tagging and automated guided tours.">
+  <meta name="twitter:image" content="https://r2dapps.github.io/Razel360/assets/demo/exterior.jpg">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Razel 360",
+    "operatingSystem": "Web, iOS, Android",
+    "applicationCategory": "MultimediaApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Enterprise-grade WebGL 360° virtual tour and architectural spatial showcase engine.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Razel Tech",
+      "url": "https://github.com/r2dapps/Razel360.git"
+    }
+  }
+  </script>
 
   <!-- Favicon (Inline VR Cardboard Headset SVG with Red Accent) -->
   <link rel="icon" type="image/svg+xml"
@@ -18,7 +69,23 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
 
-  <!-- Tailwind CSS & FontAwesome Icons -->
+  <!-- Tailwind CSS Configuration (Silences CDN production warning) & FontAwesome Icons -->
+  <script>
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#ef4444'
+            }
+          }
+        },
+        corePlugins: {
+          preflight: false
+        }
+      }
+    };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -26,43 +93,63 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       overflow: hidden;
       touch-action: manipulation;
+      background-color: #030712;
+    }
+
+    #canvas-container {
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .font-display {
       font-family: 'Outfit', sans-serif;
     }
 
-    /* Unified Monochromatic Glassmorphism with Red Accent Highlights */
+    /* Crystal Transparent Glassmorphism (Vibrant 360 view through cards) */
     .glass-frosted {
-      background: rgba(14, 18, 27, 0.65);
+      background: rgba(14, 18, 27, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    .glass-card-crystal {
+      background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
     }
 
     .glass-button {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       color: #ffffff;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-button:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.35);
     }
 
     .glass-active {
-      background: rgba(255, 255, 255, 0.18);
-      border-color: rgba(239, 68, 68, 0.8) !important;
-      box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(239, 68, 68, 0.85) !important;
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
     }
 
     .red-ink-badge {
@@ -78,7 +165,7 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: rgba(10, 14, 22, 0.4);
+      background: rgba(10, 14, 22, 0.2);
     }
 
     ::-webkit-scrollbar-thumb {
@@ -108,6 +195,13 @@
     </div>
   </div>
 
+  <!-- Toast Notification Feedback Component -->
+  <div id="toast-notification"
+    class="fixed top-5 left-1/2 -translate-x-1/2 z-50 glass-frosted px-4 py-2 rounded-xl text-xs font-semibold text-white border border-rose-500/40 shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-2">
+    <i class="fa-solid fa-circle-check text-rose-400 text-xs" id="toast-icon"></i>
+    <span id="toast-message">Link copied to clipboard!</span>
+  </div>
+
   <!-- ==================== 1. FULLSCREEN 3D WEBGL VIEWPORT ==================== -->
   <div id="canvas-container" class="fixed inset-0 w-full h-full bg-neutral-950 z-0"></div>
 
@@ -119,9 +213,16 @@
   <div id="cardboard-divider"
     class="hidden fixed top-0 bottom-0 left-1/2 w-0.5 bg-neutral-800 z-40 pointer-events-none -translate-x-1/2"></div>
 
-  <!-- ==================== 2. NAVIGATION CROSSHAIR RETICLE ==================== -->
+  <!-- Floating Mobile Exit Fullscreen / Restore UI Button -->
+  <button id="btn-mobile-exit-fs" onclick="exitMobileFullscreenOrRestoreUI()"
+    class="hidden fixed top-3 right-3 z-50 glass-frosted px-3 py-1.5 rounded-full text-xs font-bold text-white border border-rose-500/50 shadow-2xl flex items-center space-x-1.5 transition transform active:scale-95">
+    <i class="fa-solid fa-xmark text-rose-400"></i>
+    <span id="exit-btn-label">Exit Fullscreen</span>
+  </button>
+
+  <!-- ==================== 2. NAVIGATION CROSSHAIR RETICLE (STUDIO MODE ONLY) ==================== -->
   <div id="crosshair-reticle"
-    class="fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
+    class="hidden fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
     <div class="absolute w-2 h-[1.5px] -left-1.5 bg-white/70 rounded-full"></div>
     <div class="absolute w-2 h-[1.5px] -right-1.5 bg-white/70 rounded-full"></div>
     <div class="absolute h-2 w-[1.5px] -top-1.5 bg-white/70 rounded-full"></div>
@@ -144,33 +245,159 @@
     <button onclick="cancelPlacement()" class="text-slate-400 hover:text-white underline ml-1.5">Cancel</button>
   </div>
 
-  <!-- ==================== 3. TOP NAVIGATION BAR (RESPONSIVE & MINIMALIST) ==================== -->
-  <header id="main-header"
-    class="fixed top-0 left-0 right-0 h-14 md:h-16 px-3 md:px-6 flex items-center justify-between z-20 pointer-events-none transition-all duration-300">
+  <!-- ==================== 3. SCENE 1: ARCHITECTURAL LOBBY (STARTUP) ==================== -->
+  <!-- pointer-events-none on wrapper so 360 canvas rotation is never blocked -->
 
-    <!-- Left: Brand Logo & Property Switcher (Minimalist - No Tagline) -->
-    <div class="flex items-center space-x-2 pointer-events-auto">
-      <div class="flex items-center space-x-2 glass-frosted px-3 py-1.5 rounded-xl border border-white/10">
-        <div
-          class="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs font-bold border border-rose-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-          <i class="fa-solid fa-vr-cardboard text-[11px]"></i>
+  <div id="home-start-page" class="fixed inset-0 z-35 pointer-events-none transition-all duration-500">
+
+    <!-- ===== STEP 1: HERO START WRAPPER – only the floating VR button ===== -->
+    <div id="hero-start-wrapper"
+      class="absolute inset-0 flex flex-col items-center justify-between p-4 md:p-8 pointer-events-none">
+
+      <!-- Lobby Top Bar -->
+      <div class="flex items-center justify-between w-full max-w-5xl mx-auto pointer-events-auto">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400 border border-rose-500/30 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+            <i class="fa-solid fa-vr-cardboard text-sm"></i>
+          </div>
+          <div>
+            <span class="font-display font-bold text-sm md:text-base tracking-wider uppercase text-white">RAZEL 360</span>
+            <p class="text-[9px] text-white/65 font-medium">Powered by Razel Tech</p>
+          </div>
         </div>
-        <span class="font-display font-bold text-xs tracking-wider uppercase text-white">RAZEL 360</span>
+        <button onclick="shareTour()" class="glass-button px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+          <i class="fa-solid fa-share-nodes text-rose-400 text-xs"></i><span>Share</span>
+        </button>
       </div>
+
+      <!-- Center: ONLY the hero start button -->
+      <div class="flex-1 flex flex-col items-center justify-center text-center pointer-events-none pb-10">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest bg-rose-500/15 text-rose-300 border border-rose-500/30 mb-5 shadow-[0_0_15px_rgba(239,68,68,0.2)] pointer-events-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+          <span>Spatial Architectural Showcase</span>
+        </div>
+        <h1 class="font-display font-extrabold text-2xl sm:text-4xl md:text-5xl text-white tracking-tight leading-tight mb-3 pointer-events-none">
+          Luxury Virtual Real Estate
+        </h1>
+        <p class="text-xs md:text-sm text-white/80 max-w-xl mx-auto leading-relaxed mb-8 pointer-events-none">
+          Step inside multi-million dollar residences in photorealistic 8K equirectangular 3D.
+        </p>
+        <button id="btn-hero-launch-vr" onclick="openShowcaseSelector()"
+          class="pointer-events-auto group relative px-7 md:px-10 py-4 md:py-5 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-display font-bold text-sm md:text-base shadow-[0_0_40px_rgba(239,68,68,0.55)] hover:shadow-[0_0_60px_rgba(239,68,68,0.85)] transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-3 border border-rose-300/30 animate-pulse-glow">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+            <i class="fa-solid fa-vr-cardboard text-lg text-white group-hover:rotate-12 transition-transform"></i>
+          </div>
+          <span class="tracking-widest uppercase">START 360° VR SHOWCASE</span>
+          <i class="fa-solid fa-arrow-right text-sm transition-transform group-hover:translate-x-1.5"></i>
+        </button>
+      </div>
+
+      <!-- Lobby Feature Footer -->
+      <div class="w-full max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 md:gap-4 text-[10px] md:text-xs text-white/70 font-medium pointer-events-none">
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center space-x-1.5">
+          <i class="fa-solid fa-vr-cardboard text-rose-400"></i><span>Cardboard & Mobile VR</span>
+        </span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center space-x-1.5">
+          <i class="fa-solid fa-tag text-rose-400"></i><span>Bespoke Spec & Price Tags</span>
+        </span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center space-x-1.5">
+          <i class="fa-solid fa-play text-rose-400"></i><span>Autonomous Walkthrough</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: SHOWCASE SELECTOR MODAL – appears after clicking START ===== -->
+    <div id="showcase-selector-modal"
+      class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 bg-black/40 backdrop-blur-[4px] pointer-events-auto">
+
+      <div class="w-full max-w-3xl">
+        <!-- Back button -->
+        <button onclick="closeShowcaseSelector()" class="flex items-center space-x-2 text-white/60 hover:text-white text-xs font-semibold mb-5 transition">
+          <i class="fa-solid fa-arrow-left text-xs"></i><span>Back to Lobby</span>
+        </button>
+
+        <div class="text-center mb-6">
+          <h2 class="font-display font-extrabold text-xl sm:text-3xl text-white tracking-tight">Choose Your Showcase</h2>
+          <p class="text-xs text-white/65 mt-1">Select a luxury residence to begin your immersive walkthrough</p>
+        </div>
+
+        <!-- Dual Property Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Demo 1: Villa Lumina -->
+          <div onclick="enterTour('tour_villa_lumina')"
+            class="glass-card-crystal rounded-3xl p-4 md:p-5 hover:border-rose-500/60 transition-all duration-300 group flex flex-col justify-between shadow-2xl cursor-pointer transform hover:-translate-y-1">
+            <div>
+              <div class="relative h-40 md:h-48 w-full rounded-2xl bg-cover bg-center overflow-hidden mb-3 border border-white/10" style="background-image: url('./assets/demo/exterior.jpg')">
+                <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/70 backdrop-blur-md text-white border border-white/20">DEMO 1</span>
+                <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500 text-white shadow">$14,500,000</span>
+              </div>
+              <h3 class="font-display font-bold text-base md:text-lg text-white group-hover:text-rose-400 transition">Villa Lumina | Modern Residence</h3>
+              <p class="text-xs text-white/70 mt-1"><i class="fa-solid fa-location-dot text-rose-400 mr-1.5"></i>Bel Air Crest, Beverly Hills, CA</p>
+              <p class="text-[11px] text-white/80 mt-2 leading-relaxed">6 interconnected rooms. Architectural concrete, Freeman sectional, Calacatta island, negative-edge pool.</p>
+            </div>
+            <div class="pt-3 mt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="text-xs font-semibold text-rose-400 group-hover:text-white transition flex items-center space-x-1.5">
+                <span>Enter Showcase</span><i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+              </span>
+              <span class="text-[10px] text-white/50 font-mono">6 Rooms &bull; 8K</span>
+            </div>
+          </div>
+
+          <!-- Demo 2: The Palm Royale Estate -->
+          <div onclick="enterTour('tour_palm_royale')"
+            class="glass-card-crystal rounded-3xl p-4 md:p-5 hover:border-rose-500/60 transition-all duration-300 group flex flex-col justify-between shadow-2xl cursor-pointer transform hover:-translate-y-1">
+            <div>
+              <div class="relative h-40 md:h-48 w-full rounded-2xl bg-cover bg-center overflow-hidden mb-3 border border-white/10" style="background-image: url('./assets/demo2/01_royal_entrance.png')">
+                <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/70 backdrop-blur-md text-white border border-white/20">DEMO 2</span>
+                <span class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500 text-white shadow">$28,500,000</span>
+              </div>
+              <h3 class="font-display font-bold text-base md:text-lg text-white group-hover:text-rose-400 transition">The Palm Royale | French Chateau</h3>
+              <p class="text-xs text-white/70 mt-1"><i class="fa-solid fa-location-dot text-rose-400 mr-1.5"></i>Cap d'Antibes &amp; Beverly Park</p>
+              <p class="text-[11px] text-white/80 mt-2 leading-relaxed">8 interconnected rooms. French limestone arch, Murano chandelier, double-height salon, Sukabumi stone pool.</p>
+            </div>
+            <div class="pt-3 mt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="text-xs font-semibold text-rose-400 group-hover:text-white transition flex items-center space-x-1.5">
+                <span>Enter Showcase</span><i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform"></i>
+              </span>
+              <span class="text-[10px] text-white/50 font-mono">8 Rooms &bull; 8K</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==================== 4. SCENE 2: TOUR STUDIO TOP NAVIGATION (RESPONSIVE) ==================== -->
+  <header id="main-header"
+    class="hidden fixed top-0 left-0 right-0 h-14 md:h-16 px-3 md:px-6 flex items-center justify-between z-20 pointer-events-none transition-all duration-300">
+
+    <!-- Left: Return to Lobby + Property Switcher -->
+    <div class="flex items-center space-x-1.5 md:space-x-2 pointer-events-auto">
+      <button onclick="returnToLobby()"
+        class="glass-button px-2.5 md:px-3 py-1.5 rounded-xl border border-white/15 hover:border-rose-500/50 flex items-center space-x-1.5 text-xs font-semibold"
+        title="Return to Grand Lobby">
+        <i class="fa-solid fa-arrow-left text-rose-400 text-xs"></i>
+        <span class="hidden sm:inline">Lobby</span>
+      </button>
 
       <!-- Property Switcher Modal Button -->
       <button onclick="openTourPickerModal()"
-        class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
+        class="glass-button px-2.5 md:px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
         <i class="fa-solid fa-building text-rose-400 text-[11px]"></i>
         <span id="header-tour-name"
-          class="font-display tracking-wide max-w-[100px] md:max-w-[180px] truncate text-white">Villa Lumina</span>
+          class="font-display tracking-wide max-w-[85px] sm:max-w-[140px] md:max-w-[180px] truncate text-white">Villa
+          Lumina</span>
         <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
       </button>
     </div>
 
-    <!-- Center: Active Room Title Indicator -->
-    <div class="hidden lg:flex items-center pointer-events-auto">
-      <div class="glass-frosted px-4 py-1.5 rounded-full flex items-center space-x-2 border border-white/10">
+    <!-- Center: Active Room Title Indicator (Hidden on Mobile Portrait) -->
+    <div class="hidden md:flex items-center pointer-events-auto">
+      <div class="glass-frosted px-4 py-1.5 rounded-full flex items-center space-x-2 border border-white/15">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_#ef4444]"></span>
         <span class="text-[11px] font-medium text-slate-400" id="header-room-step">Room 1 of 6:</span>
         <span class="text-xs font-bold text-white tracking-wide font-display" id="header-room-title">Villa Facade &
@@ -178,57 +405,67 @@
       </div>
     </div>
 
-    <!-- Right: Consolidated Controls (Auto Demo, Studio, VR, Settings & UI Toggle) -->
-    <div class="flex items-center space-x-1.5 md:space-x-2 pointer-events-auto">
+    <!-- Right Controls: Mobile Consolidated vs Desktop Toolbar -->
+    <div class="pointer-events-auto flex items-center space-x-1.5">
 
-      <!-- Auto Demo Play Button -->
-      <button id="btn-auto-demo" onclick="toggleAutoDemo()"
-        class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5"
-        title="Play Automated Guided Tour">
-        <i class="fa-solid fa-play text-[10px] text-rose-400" id="demo-btn-icon"></i>
-        <span class="hidden sm:inline" id="demo-btn-label">Auto Demo</span>
-      </button>
+      <!-- Mobile Only Controls (< 768px): Direct VR & Unified Menu -->
+      <div class="flex md:hidden items-center space-x-1.5">
+        <button onclick="toggleCardboardVR()"
+          class="glass-button px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1">
+          <i class="fa-solid fa-vr-cardboard text-[11px] text-rose-400"></i>
+          <span>VR</span>
+        </button>
+        <button onclick="toggleSettingsModal()"
+          class="glass-button p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center" title="Menu & Controls">
+          <i class="fa-solid fa-bars text-xs text-white"></i>
+        </button>
+      </div>
 
-      <!-- Studio Drawer Toggle -->
-      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()"
-        class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-        <i class="fa-solid fa-sliders text-[11px]"></i>
-        <span class="hidden md:inline" id="editor-btn-label">Studio</span>
-      </button>
+      <!-- Desktop Toolbar (>= 768px) -->
+      <div class="hidden md:flex items-center space-x-2">
+        <button id="btn-auto-demo" onclick="toggleAutoDemo()"
+          class="glass-button px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5"
+          title="Play Automated Guided Tour">
+          <i class="fa-solid fa-play text-[10px] text-rose-400" id="demo-btn-icon"></i>
+          <span id="demo-btn-label">Auto Demo</span>
+        </button>
+        <button id="btn-toggle-editor" onclick="toggleEditorDrawer()"
+          class="glass-button px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+          <i class="fa-solid fa-sliders text-[11px]"></i>
+          <span id="editor-btn-label">Studio</span>
+        </button>
+        <button id="btn-cardboard" onclick="toggleCardboardVR()"
+          class="glass-button px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+          <i class="fa-solid fa-vr-cardboard text-[11px] text-rose-400"></i>
+          <span id="cardboard-btn-label">VR</span>
+        </button>
+        <button onclick="shareTour()"
+          class="glass-button p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center"
+          title="Share Property Showcase">
+          <i class="fa-solid fa-share-nodes text-[11px] text-slate-300"></i>
+        </button>
+        <button onclick="toggleSettingsModal()"
+          class="glass-button p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center" title="Tour Settings">
+          <i class="fa-solid fa-gear text-[11px] text-slate-300"></i>
+        </button>
+        <button onclick="toggleUIVisibility()"
+          class="glass-button p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center"
+          title="Toggle Clean View">
+          <i class="fa-solid fa-eye text-[11px] text-slate-300" id="ui-eye-icon"></i>
+        </button>
+        <button onclick="toggleFullscreen()"
+          class="glass-button p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center"
+          title="Toggle Fullscreen">
+          <i class="fa-solid fa-expand text-[11px] text-slate-300"></i>
+        </button>
+      </div>
 
-      <!-- Cardboard VR Mode -->
-      <button id="btn-cardboard" onclick="toggleCardboardVR()"
-        class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-        <i class="fa-solid fa-vr-cardboard text-[11px] text-rose-400"></i>
-        <span class="hidden sm:inline" id="cardboard-btn-label">VR</span>
-      </button>
-
-      <!-- Settings Menu Icon (Consolidates Audio, Tilt, Visualizer Specs, etc.) -->
-      <button onclick="toggleSettingsModal()"
-        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
-        title="Tour Settings">
-        <i class="fa-solid fa-gear text-[11px] text-slate-300"></i>
-      </button>
-
-      <!-- UI Hide / Show Eye Toggle (Unobstructed View) -->
-      <button onclick="toggleUIVisibility()"
-        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
-        title="Toggle Clean View">
-        <i class="fa-solid fa-eye text-[11px] text-slate-300" id="ui-eye-icon"></i>
-      </button>
-
-      <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullscreen()"
-        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
-        title="Toggle Fullscreen">
-        <i class="fa-solid fa-expand text-[11px] text-slate-300"></i>
-      </button>
     </div>
   </header>
 
-  <!-- ==================== 4. BOTTOM STREET VIEW DOCK & CAROUSEL (RESPONSIVE & COMPACT) ==================== -->
+  <!-- ==================== 5. BOTTOM STREET VIEW DOCK & CAROUSEL (STUDIO MODE) ==================== -->
   <div id="main-bottom-dock"
-    class="fixed bottom-3 md:bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-1.5 md:space-y-2 z-20 pointer-events-none px-2 md:px-4 transition-all duration-300">
+    class="hidden fixed bottom-3 md:bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-1.5 md:space-y-2 z-20 pointer-events-none px-2 md:px-4 transition-all duration-300">
 
     <!-- Collapsible Strip Container -->
     <div id="room-strip-wrapper" class="flex items-center space-x-1.5 pointer-events-auto transition-all duration-300">
@@ -277,7 +514,7 @@
     </div>
   </div>
 
-  <!-- ==================== 5. SETTINGS POPUP MODAL ==================== -->
+  <!-- ==================== 6. SETTINGS POPUP MODAL ==================== -->
   <div id="modal-settings"
     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-sm rounded-3xl p-5 border border-white/15 space-y-4 shadow-2xl">
@@ -291,10 +528,42 @@
         </button>
       </div>
 
-      <div class="space-y-3 text-xs">
+      <div class="space-y-2.5 text-xs max-h-[70vh] overflow-y-auto pr-1">
+
+        <!-- Mobile Actions Group -->
+        <div class="space-y-1.5 pb-2 border-b border-white/10 md:hidden">
+          <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Quick Controls</p>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button onclick="toggleSettingsModal(); toggleAutoDemo();"
+              class="py-2 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-play text-rose-400 text-xs"></i>
+              <span>Auto Demo</span>
+            </button>
+            <button onclick="toggleSettingsModal(); toggleEditorDrawer();"
+              class="py-2 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-sliders text-rose-400 text-xs"></i>
+              <span>Open Studio</span>
+            </button>
+            <button onclick="toggleSettingsModal(); toggleFullscreen();"
+              class="py-2 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-expand text-rose-400 text-xs"></i>
+              <span>Fullscreen</span>
+            </button>
+            <button onclick="toggleSettingsModal(); shareTour();"
+              class="py-2 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-share-nodes text-rose-400 text-xs"></i>
+              <span>Share Tour</span>
+            </button>
+          </div>
+          <button onclick="toggleSettingsModal(); returnToLobby();"
+            class="w-full mt-1.5 py-2 px-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-white font-semibold flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-arrow-left text-rose-400 text-xs"></i>
+            <span>Return to Grand Lobby</span>
+          </button>
+        </div>
 
         <!-- Sound FX Toggle -->
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
           <div class="flex items-center space-x-2.5">
             <i class="fa-solid fa-volume-high text-slate-300 w-4 text-center"></i>
             <div>
@@ -309,7 +578,7 @@
         </div>
 
         <!-- Mobile Gyroscope Tilt Toggle -->
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
           <div class="flex items-center space-x-2.5">
             <i class="fa-solid fa-compass text-slate-300 w-4 text-center"></i>
             <div>
@@ -324,7 +593,7 @@
         </div>
 
         <!-- Center Crosshair Reticle Toggle -->
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
           <div class="flex items-center space-x-2.5">
             <i class="fa-solid fa-crosshairs text-slate-300 w-4 text-center"></i>
             <div>
@@ -355,25 +624,23 @@
     </div>
   </div>
 
-  <!-- ==================== 6. SLIDE-OUT STUDIO DRAWER (EDITOR) ==================== -->
+  <!-- ==================== 7. SLIDE-OUT STUDIO DRAWER (EDITOR) ==================== -->
   <aside id="editor-drawer"
     class="fixed top-14 md:top-16 bottom-3 md:bottom-4 left-3 md:left-4 w-96 max-w-[calc(100vw-24px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
 
     <!-- Drawer Header -->
     <div class="p-3.5 md:p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
       <div class="flex items-center space-x-2.5">
-        <div
-          class="w-7 h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-xs text-rose-400 border border-rose-500/30">
-          <i class="fa-solid fa-vr-cardboard text-xl text-white"></i>
+        <div class="w-7 h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-xs text-rose-400 border border-rose-500/30">
+          <i class="fa-solid fa-vr-cardboard"></i>
         </div>
         <div>
-
-          <h2 class="text-xs md:text-sm font-bold font-display text-white">Razel 360 </h2>
-          <p class="text-[9px] md:text-[10px] text-slate-400 font-medium">Powered by Razel Tech</p>
+          <h2 class="text-xs md:text-sm font-bold font-display text-white">RAZEL 360</h2>
+          <p class="text-[9px] md:text-[10px] text-white/60 font-medium">Powered by Razel Tech</p>
         </div>
       </div>
       <button onclick="toggleEditorDrawer()"
-        class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+        class="text-white/50 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
     </div>
@@ -386,18 +653,24 @@
         <label class="cursor-pointer block">
           <i class="fa-solid fa-cloud-arrow-up text-rose-400 text-lg mb-1"></i>
           <p class="text-xs font-bold text-white">Upload 360° Panorama Renders</p>
-          <p class="text-[10px] text-slate-400 mt-0.5">Equirectangular 2:1 ratio (Auto-seamless blend)</p>
+          <p class="text-[10px] text-white/55 mt-0.5">Equirectangular 2:1 ratio &bull; Auto-seamless blend</p>
           <input type="file" id="image-upload" accept="image/*" multiple class="hidden"
             onchange="handleImageBatch(event)">
         </label>
       </div>
 
+      <!-- Create New Tour Button -->
+      <button onclick="createNewTourFromDrawer()"
+        class="w-full py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-white text-xs font-bold transition flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-plus text-rose-400"></i>
+        <span>Create New Property Tour</span>
+      </button>
+
       <!-- Active Tour Rooms List -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rooms in Tour</h3>
-          <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">6
-            Rooms</span>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-white/60">Rooms in Tour</h3>
+          <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">6 Rooms</span>
         </div>
         <div id="studio-scene-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
       </div>
@@ -470,7 +743,7 @@
 
         <!-- Hotspots in Current Room -->
         <div class="pt-2 border-t border-white/10">
-          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Hotspots in this room:</div>
+          <div class="text-[10px] uppercase font-bold text-white/50 tracking-wider mb-1">Hotspots in this room:</div>
           <div id="room-hotspots-editor-list" class="space-y-1 max-h-28 overflow-y-auto pr-1"></div>
         </div>
       </div>
@@ -490,7 +763,7 @@
     </div>
   </aside>
 
-  <!-- ==================== 7. PROPERTY TOUR SELECTOR MODAL ==================== -->
+  <!-- ==================== 8. PROPERTY TOUR SELECTOR MODAL ==================== -->
   <div id="modal-tour-picker"
     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
@@ -520,7 +793,7 @@
     </div>
   </div>
 
-  <!-- ==================== 8. DESIGNER GUIDELINES MODAL ==================== -->
+  <!-- ==================== 9. DESIGNER GUIDELINES MODAL ==================== -->
   <div id="modal-designer-guidelines"
     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-2xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
@@ -584,7 +857,7 @@
     </div>
   </div>
 
-  <!-- ==================== 9. ROOM GALLERY MODAL ==================== -->
+  <!-- ==================== 10. ROOM GALLERY MODAL ==================== -->
   <div id="modal-scene-gallery"
     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-3xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
@@ -601,9 +874,11 @@
     </div>
   </div>
 
-  <!-- ==================== 10. APPLICATION CORE LOGIC ==================== -->
+  <!-- ==================== 11. APPLICATION CORE LOGIC ==================== -->
   <script>
     // ---------- MULTI-TOUR DATA SCHEMA (LUXURY ARCHITECTURAL PROPERTIES) ----------
+
+    // DEMO 1: Villa Lumina (Modern Concrete & Calacatta Residence)
     const DEMO_VILLA_LUMINA = {
       id: 'tour_villa_lumina',
       title: 'Villa Lumina | Modern Residence',
@@ -776,17 +1051,18 @@
       ]
     };
 
+    // DEMO 2: The Palm Royale Estate (French Limestone Mediterranean Chateau)
     const DEMO_PALM_ROYALE = {
       id: 'tour_palm_royale',
       title: 'The Palm Royale | French Limestone Chateau',
       location: 'Cap d’Antibes & Beverly Park',
       price: '$28,500,000',
-      heroImage: './assets/demo2/2026-09-25_16-48-08_qwen_00079_.png',
+      heroImage: './assets/demo2/01_royal_entrance.png',
       scenes: [
         {
           id: 'scene_royale_exterior',
           name: 'Royal Entrance & Facade',
-          imageSrc: './assets/demo2/2026-09-25_16-48-08_qwen_00079_.png',
+          imageSrc: './assets/demo2/01_royal_entrance.png',
           hotspots: [
             { id: 'hs_pr_ext_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: 0, y: -20, z: -390 },
             { id: 'hs_pr_ext_to_pool', type: 'portal', targetSceneId: 'scene_royale_pool', x: 340, y: -40, z: 180 },
@@ -813,7 +1089,7 @@
         {
           id: 'scene_royale_foyer',
           name: 'Grand Reception Foyer',
-          imageSrc: './assets/demo2/2026-09-25_16-58-24_qwen_00080_.png',
+          imageSrc: './assets/demo2/02_grand_foyer.png',
           hotspots: [
             { id: 'hs_pr_foyer_to_ext', type: 'portal', targetSceneId: 'scene_royale_exterior', x: 20, y: -30, z: 390 },
             { id: 'hs_pr_foyer_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: 350, y: -30, z: -170 },
@@ -841,7 +1117,7 @@
         {
           id: 'scene_royale_living',
           name: 'Double-Height Great Salon',
-          imageSrc: './assets/demo2/2026-09-25_17-10-53_qwen_00081_.png',
+          imageSrc: './assets/demo2/03_great_salon.png',
           hotspots: [
             { id: 'hs_pr_liv_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: -360, y: -30, z: 150 },
             { id: 'hs_pr_liv_to_kitchen', type: 'portal', targetSceneId: 'scene_royale_kitchen', x: 330, y: -35, z: 200 },
@@ -869,7 +1145,7 @@
         {
           id: 'scene_royale_dining',
           name: 'Formal Banquet Dining Salon',
-          imageSrc: './assets/demo2/2026-09-25_17-21-58_qwen_00085_.png',
+          imageSrc: './assets/demo2/07_formal_dining.png',
           hotspots: [
             { id: 'hs_pr_din_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: -330, y: -30, z: 210 },
             { id: 'hs_pr_din_to_kitchen', type: 'portal', targetSceneId: 'scene_royale_kitchen', x: 350, y: -30, z: 170 },
@@ -896,7 +1172,7 @@
         {
           id: 'scene_royale_kitchen',
           name: 'Chef Sculptural Kitchen',
-          imageSrc: './assets/demo2/2026-09-25_17-14-09_qwen_00082_.png',
+          imageSrc: './assets/demo2/04_chef_kitchen.png',
           hotspots: [
             { id: 'hs_pr_kit_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: -350, y: -30, z: -170 },
             { id: 'hs_pr_kit_to_dining', type: 'portal', targetSceneId: 'scene_royale_dining', x: -330, y: -30, z: 210 },
@@ -924,7 +1200,7 @@
         {
           id: 'scene_royale_bedroom',
           name: 'Primary Master Suite Retreat',
-          imageSrc: './assets/demo2/2026-09-25_17-16-47_qwen_00083_.png',
+          imageSrc: './assets/demo2/05_master_suite.png',
           hotspots: [
             { id: 'hs_pr_bed_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: -350, y: -30, z: -180 },
             { id: 'hs_pr_bed_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: 340, y: -30, z: 180 },
@@ -951,7 +1227,7 @@
         {
           id: 'scene_royale_terrace',
           name: 'Sunset Sky Terrace & Pavilion',
-          imageSrc: './assets/demo2/2026-09-25_17-19-32_qwen_00084_.png',
+          imageSrc: './assets/demo2/06_sunset_terrace.png',
           hotspots: [
             { id: 'hs_pr_ter_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: 260, y: -30, z: -290 },
             { id: 'hs_pr_ter_to_pool', type: 'portal', targetSceneId: 'scene_royale_pool', x: -330, y: -45, z: 200 },
@@ -978,7 +1254,7 @@
         {
           id: 'scene_royale_pool',
           name: 'Resort Oasis Pool & Loggia',
-          imageSrc: './assets/demo2/2026-09-25_17-24-21_qwen_00086_.png',
+          imageSrc: './assets/demo2/08_resort_pool.png',
           hotspots: [
             { id: 'hs_pr_pool_to_exterior', type: 'portal', targetSceneId: 'scene_royale_exterior', x: -350, y: -30, z: -170 },
             { id: 'hs_pr_pool_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: 330, y: -30, z: 200 },
@@ -1021,6 +1297,8 @@
     let isReticleVisible = true;
     let isUIVisible = true;
     let isBottomStripCollapsed = false;
+    let isHomePageOpen = true; // Start in the Grand Architectural Lobby
+    let isLobbyActive = true;
 
     // Automated Demo Guided Walkthrough
     let isAutoDemoActive = false;
@@ -1031,7 +1309,12 @@
     let portalMeshes = [];
     let infoHotspotMeshes = [];
     let lon = 0, lat = 0, phi = 0, theta = 0;
-    let isDragging = false, dragStartX = 0, dragStartY = 0, dragStartLon = 0, dragStartLat = 0;
+    let targetLon = 0, targetLat = 0;
+    let lonVelocity = 0, latVelocity = 0;
+    let isDragging = false, dragMovedDist = 0;
+    let dragStartX = 0, dragStartY = 0, dragStartLon = 0, dragStartLat = 0;
+    let lastTouchX = 0, lastTouchY = 0, lastTouchTime = 0;
+    let hasAttemptedAutoGyro = false;
 
     // Optical Zooming (Google Street View smooth FOV)
     let currentFov = 75;
@@ -1045,6 +1328,14 @@
     let targetedPortal = null;
     let dwellStartTime = 0;
     const DWELL_TIMEOUT_MS = 1300;
+
+    // Hover zoom state (for callout cinematic focus)
+    let calloutHoverFovTarget = 75;
+    let isCalloutHovered = false;
+
+    // Hotspot reposition state
+    let isRepositionArmed = false;
+    let repositionHotspotId = null;
 
     // Texture Cache (Instant Room Swap - No lingering previous room)
     const textureCache = new Map();
@@ -1127,9 +1418,281 @@
       }
     }
 
+    // ---------- TOAST NOTIFICATION & SOCIAL SHARING ----------
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast-notification');
+      const msgEl = document.getElementById('toast-message');
+      const icon = document.getElementById('toast-icon');
+
+      if (!toast) return;
+      msgEl.innerText = message;
+      if (isError) {
+        icon.className = "fa-solid fa-circle-exclamation text-rose-400 text-xs";
+      } else {
+        icon.className = "fa-solid fa-circle-check text-rose-400 text-xs";
+      }
+
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function shareTour() {
+      const activeTour = getActiveTour();
+      const shareData = {
+        title: `${activeTour.title} | Razel 360 Showcase`,
+        text: `Explore ${activeTour.title} in photorealistic 8K 360° virtual reality with Razel 360:`,
+        url: window.location.href
+      };
+
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        navigator.share(shareData).catch(() => { });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          showToast("Tour link copied to clipboard! Ready to share.");
+        }).catch(() => {
+          prompt("Copy showcase URL:", window.location.href);
+        });
+      } else {
+        prompt("Copy showcase URL:", window.location.href);
+      }
+    }
+
+    // ---------- SCENE 1: ARCHITECTURAL LOBBY & SCENE 2: TOUR STUDIO ----------
+    function clearHotspotMeshes() {
+      // Recursively dispose all geometries and materials to prevent GPU leaks
+      // and prevent previous scene's meshes from bleeding into the next scene
+      function disposeGroup(obj) {
+        if (!obj) return;
+        // Traverse all children depth-first and dispose
+        while (obj.children && obj.children.length > 0) {
+          disposeGroup(obj.children[0]);
+          obj.remove(obj.children[0]);
+        }
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (obj.material.map) obj.material.map.dispose();
+          obj.material.dispose();
+        }
+      }
+
+      if (portalMeshes) {
+        portalMeshes.forEach(m => {
+          disposeGroup(m);
+          scene.remove(m);
+        });
+        portalMeshes = [];
+      }
+      if (infoHotspotMeshes) {
+        infoHotspotMeshes.forEach(m => {
+          disposeGroup(m);
+          scene.remove(m);
+        });
+        infoHotspotMeshes = [];
+      }
+
+      // Always reset hover zoom state so it never leaks into next scene
+      isCalloutHovered = false;
+      calloutHoverFovTarget = 75;
+    }
+
+    function loadLobbyScene() {
+      isLobbyActive = true;
+      isHomePageOpen = true;
+      clearHotspotMeshes();
+
+      // Show hero start wrapper, hide showcase selector
+      const heroWrapper = document.getElementById('hero-start-wrapper');
+      const showcaseModal = document.getElementById('showcase-selector-modal');
+      if (heroWrapper) heroWrapper.classList.remove('hidden');
+      if (showcaseModal) showcaseModal.classList.add('hidden');
+
+      // Ensure sphere is bright white (not dark from init color)
+      if (sphereMesh) sphereMesh.material.color.setHex(0xffffff);
+
+      // Load high-resolution 360 lobby panorama
+      loadSeamlessTexture('./assets/lobby/lobby_360.jpg', (texture) => {
+        sphereMesh.material.map = texture;
+        sphereMesh.material.color.setHex(0xffffff);
+        sphereMesh.material.needsUpdate = true;
+
+        // Hide preloader
+        const preloader = document.getElementById('initial-preloader');
+        if (preloader) {
+          preloader.classList.add('opacity-0');
+          setTimeout(() => preloader.classList.add('hidden'), 500);
+        }
+      });
+    }
+
+    // Storyboard Step 2: Show Showcase Selector (triggered by START button)
+    function openShowcaseSelector() {
+      const heroWrapper = document.getElementById('hero-start-wrapper');
+      const showcaseModal = document.getElementById('showcase-selector-modal');
+      if (heroWrapper) heroWrapper.classList.add('hidden');
+      if (showcaseModal) showcaseModal.classList.remove('hidden');
+    }
+
+    // Back to hero lobby start button
+    function closeShowcaseSelector() {
+      const heroWrapper = document.getElementById('hero-start-wrapper');
+      const showcaseModal = document.getElementById('showcase-selector-modal');
+      if (showcaseModal) showcaseModal.classList.add('hidden');
+      if (heroWrapper) heroWrapper.classList.remove('hidden');
+    }
+
+    function enterTour(tourId, startWithVR = false) {
+      // Only play whoosh if actually leaving lobby (not called by button toggles when already in studio)
+      const wasInLobby = isLobbyActive;
+      isLobbyActive = false;
+      isHomePageOpen = false;
+      if (wasInLobby) playWhooshSound();
+
+      // Hide Lobby Overlay (both sub-states)
+      const heroWrapper = document.getElementById('hero-start-wrapper');
+      const showcaseModal = document.getElementById('showcase-selector-modal');
+      const lobby = document.getElementById('home-start-page');
+      if (heroWrapper) heroWrapper.classList.add('hidden');
+      if (showcaseModal) showcaseModal.classList.add('hidden');
+      if (lobby) lobby.classList.add('hidden');
+
+      // Show Studio Navigation and Bottom Dock
+      const header = document.getElementById('main-header');
+      const bottomDock = document.getElementById('main-bottom-dock');
+      const reticle = document.getElementById('crosshair-reticle');
+      if (header) header.classList.remove('hidden');
+      if (bottomDock) bottomDock.classList.remove('hidden');
+      if (reticle && isReticleVisible) reticle.classList.remove('hidden');
+
+      // Select and activate tour
+      const tour = appState.tours.find(t => t.id === tourId) || appState.tours[0];
+      appState.activeTourId = tour.id;
+      appState.activeSceneId = tour.scenes[0].id;
+      saveAppStorage();
+      renderAllUI();
+      // Pass false to switchScene - enterTour already played the whoosh above
+      switchScene(tour.scenes[0].id, false);
+
+      if (startWithVR) {
+        setTimeout(() => {
+          if (!isCardboardVR) toggleCardboardVR();
+        }, 450);
+      }
+    }
+
+    function returnToLobby() {
+      isLobbyActive = true;
+      isHomePageOpen = true;
+      playWhooshSound();
+
+      if (isCardboardVR) toggleCardboardVR();
+      if (isAutoDemoActive) toggleAutoDemo();
+
+      // Hide Studio Navigation and Bottom Dock
+      const header = document.getElementById('main-header');
+      const bottomDock = document.getElementById('main-bottom-dock');
+      const reticle = document.getElementById('crosshair-reticle');
+      if (header) header.classList.add('hidden');
+      if (bottomDock) bottomDock.classList.add('hidden');
+      if (reticle) reticle.classList.add('hidden');
+
+      // Show Lobby Overlay (reset to Step 1 hero state)
+      const lobby = document.getElementById('home-start-page');
+      if (lobby) lobby.classList.remove('hidden');
+
+      loadLobbyScene();
+    }
+
+    function launchTour(tourId, openStudio = false) {
+      enterTour(tourId, false);
+      if (openStudio) {
+        setTimeout(() => {
+          if (!isEditorOpen) toggleEditorDrawer();
+        }, 400);
+      }
+    }
+
+    // launchTourWithVR now opens showcase selector not entering tour directly
+    function launchTourWithVR() {
+      openShowcaseSelector();
+    }
+
+    function openStartPage() {
+      returnToLobby();
+    }
+
+    function closeStartPage() {
+      enterTour(appState.activeTourId);
+    }
+
+    function exitMobileFullscreenOrRestoreUI() {
+      // Priority order: exit VR first, then fullscreen, then restore UI
+      if (isCardboardVR) {
+        toggleCardboardVR(); // This also exits fullscreen and updates button
+        return;
+      }
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
+      }
+      if (!isUIVisible) {
+        toggleUIVisibility();
+      }
+      updateMobileExitButton();
+    }
+
+    function updateMobileExitButton() {
+      const btn = document.getElementById('btn-mobile-exit-fs');
+      if (!btn) return;
+      const isFs = !!document.fullscreenElement;
+      const needsRestore = !isUIVisible || isFs || isCardboardVR;
+
+      if (needsRestore && !isLobbyActive) {
+        btn.classList.remove('hidden');
+        const label = document.getElementById('exit-btn-label');
+        if (label) {
+          if (isCardboardVR) label.innerText = 'Exit VR';
+          else if (!isUIVisible) label.innerText = 'Show UI';
+          else label.innerText = 'Exit Fullscreen';
+        }
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+
+    document.addEventListener('fullscreenchange', updateMobileExitButton);
+
+    // Escape key: restore hidden UI or exit fullscreen on desktop
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !isLobbyActive) {
+        if (!isUIVisible) toggleUIVisibility();
+        if (isCardboardVR) toggleCardboardVR();
+      }
+    });
+
+    function checkMobileAutoGyro() {
+      if (hasAttemptedAutoGyro || isGyroActive) return;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+      if (isMobile) {
+        hasAttemptedAutoGyro = true;
+        if (typeof DeviceOrientationEvent !== 'undefined') {
+          if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission().then(state => {
+              if (state === 'granted') bindOrientationListener();
+            }).catch(() => { });
+          } else {
+            bindOrientationListener();
+          }
+        }
+      }
+    }
+
     // ---------- SEAMLESS EDGE-BLENDING TEXTURE ENGINE ----------
     // Cross-fades the 16 left and right pixels of the 360 panorama on an offscreen canvas.
-    // Eliminates the vertical 360 cut seam line completely!
+    // If image is already mathematically seamless from 3D software (avgDiff <= 1.5), 100% bit-exact original image is untouched!
     function createSeamlessTexture(imgElement) {
       const canvas = document.createElement('canvas');
       canvas.width = imgElement.width || imgElement.naturalWidth || 2048;
@@ -1152,12 +1715,12 @@
           for (let y = 0; y < h; y += step) {
             const l = (y * w) * 4;
             const r = (y * w + (w - 1)) * 4;
-            seamDiff += Math.abs(d[l] - d[r]) + Math.abs(d[l+1] - d[r+1]) + Math.abs(d[l+2] - d[r+2]);
+            seamDiff += Math.abs(d[l] - d[r]) + Math.abs(d[l + 1] - d[r + 1]) + Math.abs(d[l + 2] - d[r + 2]);
             samples += 3;
           }
           const avgDiff = seamDiff / samples;
 
-          // Only apply feathering if the edges don't match (e.g. AI-generated renders).
+          // Only apply feathering if edges don't match (e.g. AI-generated renders).
           // If already mathematically seamless from 3D studio renders (avgDiff <= 1.5), 100% original pixels are untouched!
           if (avgDiff > 1.5) {
             for (let y = 0; y < h; y++) {
@@ -1219,14 +1782,31 @@
     }
 
     // ---------- INITIALIZATION ----------
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) { /* Wake lock not supported or denied */ }
+    }
+
     window.onload = function () {
       initThreeEngine();
       loadAppStorage();
       bindWindowResize();
       bindTouchGestures();
-      renderAllUI();
+      loadLobbyScene();
       requestAnimationFrame(renderLoop);
+      requestWakeLock();
     };
+
+    // Re-acquire wake lock on visibility change (e.g., tab switch back)
+    document.addEventListener('visibilitychange', () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    });
 
     function initThreeEngine() {
       const container = document.getElementById('canvas-container');
@@ -1326,8 +1906,9 @@
 
       const curtain = document.getElementById('transition-curtain');
 
-      // 1. Immediately fade to black to prevent previous image lingering
+      // 1. Immediately fade to black AND clear old hotspots before texture loads
       curtain.style.opacity = '1';
+      clearHotspotMeshes(); // Wipe previous scene's cards immediately — no bleed
 
       if (isWalkThrough) playWhooshSound();
 
@@ -1405,8 +1986,6 @@
     }
 
     // ---------- HIGH-CONTRAST 2X RETINA CALLOUT TEXTURE GENERATOR ----------
-    // Resolves white-on-white card bug by ensuring ctx.beginPath() on all subpaths.
-    // Deep Charcoal slate card background (#0a0e17) with pure white text and red-ink category badge.
     function createLuxuryCalloutTexture(item) {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
@@ -1422,7 +2001,7 @@
       const cardH = 430;
       const radius = 32;
 
-      // 1. Deep Charcoal Glass Card Background (Opaque luxury dark tone)
+      // 1. Deep Charcoal Glass Card Background
       ctx.beginPath();
       roundRect(ctx, cardX, cardY, cardW, cardH, radius);
       ctx.fillStyle = 'rgba(10, 14, 23, 0.97)';
@@ -1462,7 +2041,7 @@
         ctx.fillStyle = '#ffffff';
         ctx.fill();
 
-        ctx.fillStyle = '#0a0e17'; // Pure solid dark charcoal text on white badge
+        ctx.fillStyle = '#0a0e17';
         ctx.font = 'bold 28px "Outfit", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1547,16 +2126,7 @@
 
     // ---------- 3D HOTSPOTS ENGINE ----------
     function rebuildHotspotMeshes() {
-      portalMeshes.forEach(m => scene.remove(m));
-      portalMeshes = [];
-
-      infoHotspotMeshes.forEach(m => {
-        if (m.userData.card && m.userData.card.material && m.userData.card.material.map) {
-          m.userData.card.material.map.dispose();
-        }
-        scene.remove(m);
-      });
-      infoHotspotMeshes = [];
+      clearHotspotMeshes();
 
       const current = getActiveScene();
       if (!current || !current.hotspots) return;
@@ -1571,7 +2141,6 @@
     }
 
     // 1. Upright Vertical Doorway Portal Frame & Floor Doorstep Mesh (NO DULL GRAY)
-    // Vertical rectangle that looks like a door with glowing border, door icon, and floor doorstep mat
     function create3DPortalDoorstepMesh(hs) {
       const portalGroup = new THREE.Group();
       const tour = getActiveTour();
@@ -1696,7 +2265,7 @@
       const group = new THREE.Group();
       group.position.set(hs.x, hs.y, hs.z);
 
-      // Tiny Red-Inked Dot Beacon (Radius 2.0 - Clean & subtle on item)
+      // Tiny Red-Inked Dot Beacon (Radius 2.0)
       const dotGeo = new THREE.SphereGeometry(2.0, 16, 16);
       const dotMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
       const dot = new THREE.Mesh(dotGeo, dotMat);
@@ -1806,8 +2375,16 @@
         if (isTargeted && !group.userData.wasHovered) {
           playPopSound();
           group.userData.wasHovered = true;
+          // Cinematic zoom-in when callout is entered
+          isCalloutHovered = true;
+          calloutHoverFovTarget = 52;
         } else if (!isTargeted && group.userData.wasHovered) {
           group.userData.wasHovered = false;
+        }
+
+        // Track if any callout is still targeted this frame
+        if (!isTargeted && isCalloutHovered && group.userData.wasHovered === false) {
+          // Will be reset below after the loop
         }
 
         // Smooth animation progress interpolation
@@ -1847,6 +2424,23 @@
           pulse.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.15);
         }
       });
+
+      // Smooth cinematic zoom-in/out based on whether any callout is targeted this frame
+      if (activeCallout) {
+        if (!isCalloutHovered) {
+          isCalloutHovered = true;
+          calloutHoverFovTarget = 52; // Gentle zoom-in
+        }
+      } else {
+        if (isCalloutHovered) {
+          isCalloutHovered = false;
+          calloutHoverFovTarget = 75; // Smooth zoom-out
+        }
+      }
+      // Drive targetFov softly toward callout zoom target (eases in/out, non-destructive of manual zoom)
+      if (Math.abs(targetFov - calloutHoverFovTarget) > 1.5) {
+        targetFov = THREE.MathUtils.lerp(targetFov, calloutHoverFovTarget, 0.06);
+      }
 
       // Doorway portals lookAt billboarding (keep upright facing user)
       portalMeshes.forEach(group => {
@@ -1936,19 +2530,49 @@
 
     // ---------- DRAG & MOBILE GYROSCOPE CONTROLS ----------
     function onPointerDown(e) {
+      if (e.button !== undefined && e.button !== 0) return;
       if (isAutoDemoActive) toggleAutoDemo();
 
       isDragging = true;
+      dragMovedDist = 0;
       dragStartX = e.clientX;
       dragStartY = e.clientY;
-      dragStartLon = lon;
+      dragStartLon = lon;   // Snap to current rendered lon directly (no lag)
       dragStartLat = lat;
+      targetLon = lon;
+      targetLat = lat;
+      lastTouchX = e.clientX;
+      lastTouchY = e.clientY;
+      lastTouchTime = performance.now();
+      lonVelocity = 0;
+      latVelocity = 0;
+      // Gyro is MANUAL only - user must enable via Settings
     }
 
+
     function onPointerMove(e) {
-      if (!isDragging || isGyroActive) return;
-      lon = (dragStartX - e.clientX) * 0.15 + dragStartLon;
-      lat = (e.clientY - dragStartY) * 0.15 + dragStartLat;
+      if (!isDragging) return;
+      const now = performance.now();
+      const dt = Math.max(1, now - lastTouchTime);
+      const dx = e.clientX - lastTouchX;
+      const dy = e.clientY - lastTouchY;
+
+      dragMovedDist += Math.abs(dx) + Math.abs(dy);
+
+      // Direct 1:1 mapping - no lag, no panning feel
+      if (!isGyroActive) {
+        lonVelocity = -dx / dt * 3.5;
+        latVelocity = dy / dt * 3.5;
+        // Direct delta from drag start = instant responsive feel
+        lon = (dragStartX - e.clientX) * 0.14 + dragStartLon;
+        lat = (e.clientY - dragStartY) * 0.14 + dragStartLat;
+        targetLon = lon;
+        targetLat = lat;
+      }
+
+      lastTouchX = e.clientX;
+      lastTouchY = e.clientY;
+      lastTouchTime = now;
     }
 
     function onPointerUp() { isDragging = false; }
@@ -1990,13 +2614,34 @@
 
     function handleOrientationEvent(e) {
       if (!isGyroActive) return;
-      deviceOrientation.alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-      deviceOrientation.beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-      deviceOrientation.gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
 
-      const euler = new THREE.Euler(deviceOrientation.beta, deviceOrientation.alpha, -deviceOrientation.gamma, 'YXZ');
-      camera.quaternion.setFromEuler(euler);
-      camera.quaternion.multiply(new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)));
+      const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+      const beta  = e.beta  ? THREE.MathUtils.degToRad(e.beta)  : 0;
+      const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+
+      // Screen orientation compensation (crucial for landscape VR mode)
+      // Without this, rotating the phone 90° makes the horizon tilt sideways
+      const screenAngle = (screen.orientation?.angle ?? window.orientation ?? 0);
+      const orient = THREE.MathUtils.degToRad(screenAngle);
+
+      // Standard W3C device orientation → camera quaternion formula
+      // Ref: https://www.w3.org/TR/orientation-event/
+      const q0 = new THREE.Quaternion();
+      const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // World → camera base
+
+      const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+      q0.setFromEuler(euler);
+      q0.multiply(q1);
+
+      // Apply screen rotation offset so landscape and portrait both work
+      const qScreen = new THREE.Quaternion();
+      qScreen.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -orient);
+      q0.multiply(qScreen);
+
+      camera.quaternion.copy(q0);
+      deviceOrientation.alpha = alpha;
+      deviceOrientation.beta  = beta;
+      deviceOrientation.gamma = gamma;
     }
 
     // ---------- UI COLLAPSIBILITY & SETTINGS DRAWER ----------
@@ -2035,6 +2680,8 @@
         bottomDock.classList.add('opacity-0', 'pointer-events-none');
         eyeIcon.className = "fa-solid fa-eye-slash text-[11px] text-rose-400";
       }
+      // Always update the floating restore button so desktop users can get back
+      updateMobileExitButton();
     }
 
     function toggleBottomStripCollapse() {
@@ -2070,6 +2717,16 @@
         header.classList.add('hidden');
         bottomDock.classList.add('hidden');
         reticle.classList.remove('hidden');
+        // Only trigger lobby exit if we're actually still in lobby
+        if (isLobbyActive) closeStartPage();
+
+        // Lock to landscape for proper VR head-tracking axes
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => { /* silently fail on desktop */ });
+        }
+
+        // Auto-enable gyro when entering VR (mandatory for head tracking)
+        if (!isGyroActive) toggleGyroscope();
 
         if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { });
       } else {
@@ -2080,9 +2737,15 @@
         header.classList.remove('hidden');
         bottomDock.classList.remove('hidden');
 
+        // Unlock orientation when leaving VR
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+
         if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => { });
       }
       onWindowResize();
+      updateMobileExitButton();
     }
 
     function toggleFullscreen() {
@@ -2104,6 +2767,8 @@
         drawer.classList.remove('-translate-x-[115%]');
         btn.classList.add('glass-active', 'text-white');
         label.innerText = "Close";
+        // Only enter tour (and play sound) if we're actually still in lobby
+        if (isLobbyActive) closeStartPage();
       } else {
         drawer.classList.add('-translate-x-[115%]');
         btn.classList.remove('glass-active', 'text-white');
@@ -2156,17 +2821,63 @@
 
     function cancelPlacement() {
       isPlacementArmed = false;
+      isRepositionArmed = false;
+      repositionHotspotId = null;
       document.getElementById('placement-alert').classList.add('hidden');
       document.getElementById('portal-btn-label').innerText = "Place Doorway Portal";
       document.getElementById('info-btn-label').innerText = "Place Item Beacon Dot";
     }
 
+    function armReposition(hotspotId) {
+      // Enter reposition mode for an existing hotspot
+      isRepositionArmed = true;
+      repositionHotspotId = hotspotId;
+      isPlacementArmed = false;
+      const alertBox = document.getElementById('placement-alert');
+      const alertText = document.getElementById('placement-alert-text');
+      alertBox.classList.remove('hidden');
+      alertText.innerText = 'Click the new position on the scene to move this hotspot';
+      playPopSound();
+    }
+
     function onCanvasClick(e) {
+      // Ignore click if user was dragging/rotating (prevents false teleport triggers)
+      if (dragMovedDist > 8) return;
+
       if (isCardboardVR) {
         targetFov = (targetFov < 60) ? 75 : 45;
         return;
       }
 
+      // ---- REPOSITION MODE: update existing hotspot position ----
+      if (isRepositionArmed && repositionHotspotId) {
+        const mouse = new THREE.Vector2(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          -(e.clientY / window.innerHeight) * 2 + 1
+        );
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const hits = raycaster.intersectObject(sphereMesh);
+        if (hits.length > 0) {
+          const point = hits[0].point.clone().normalize().multiplyScalar(400);
+          const curScene = getActiveScene();
+          const hs = curScene.hotspots.find(h => h.id === repositionHotspotId);
+          if (hs) {
+            hs.x = point.x;
+            hs.y = point.y;
+            hs.z = point.z;
+            saveAppStorage();
+            rebuildHotspotMeshes();
+            renderAllUI();
+            playPopSound();
+            showToast('Hotspot moved successfully');
+          }
+          cancelPlacement();
+        }
+        return;
+      }
+
+      // ---- PLACEMENT MODE: create new hotspot ----
       if (isPlacementArmed) {
         const mouse = new THREE.Vector2(
           (e.clientX / window.innerWidth) * 2 - 1,
@@ -2334,28 +3045,42 @@
       hsBadge.innerText = `${count} active`;
 
       if (count === 0) {
-        hsList.innerHTML = `<p class="text-[11px] text-slate-500 italic py-1">No hotspots placed in this room.</p>`;
+        hsList.innerHTML = `<p class="text-[11px] text-white/40 italic py-1">No hotspots placed in this room.</p>`;
       } else {
         current.hotspots.forEach(h => {
           const row = document.createElement('div');
           row.className = "flex items-center justify-between p-1.5 bg-white/5 rounded-lg border border-white/5 text-[11px]";
           if (h.type === 'info') {
             row.innerHTML = `
-              <div class="flex items-center space-x-1.5 truncate">
-                <i class="fa-solid fa-circle text-[7px] text-rose-500"></i>
+              <div class="flex items-center space-x-1.5 truncate flex-1 min-w-0">
+                <i class="fa-solid fa-circle text-[7px] text-rose-500 shrink-0"></i>
                 <span class="text-white font-medium truncate">${h.title}</span>
-                ${h.price ? `<span class="text-rose-400 font-bold ml-1">${h.price}</span>` : ''}
+                ${h.price ? `<span class="text-rose-400 font-bold ml-1 shrink-0">${h.price}</span>` : ''}
               </div>
-              <button onclick="deleteHotspot('${h.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
+              <div class="flex items-center space-x-0.5 ml-1 shrink-0">
+                <button onclick="armReposition('${h.id}')" title="Move hotspot" class="text-white/40 hover:text-rose-300 p-1 rounded transition">
+                  <i class="fa-solid fa-arrows-up-down-left-right text-[10px]"></i>
+                </button>
+                <button onclick="deleteHotspot('${h.id}')" title="Delete" class="text-white/40 hover:text-rose-400 p-1 rounded transition">
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                </button>
+              </div>
             `;
           } else {
             const tgt = tour.scenes.find(s => s.id === h.targetSceneId);
             row.innerHTML = `
-              <div class="flex items-center space-x-1.5 truncate">
-                <i class="fa-solid fa-door-open text-rose-400 text-[10px]"></i>
-                <span class="text-slate-300 truncate">Doorstep &rarr; <span class="text-white font-medium">${tgt ? tgt.name : 'Next Room'}</span></span>
+              <div class="flex items-center space-x-1.5 truncate flex-1 min-w-0">
+                <i class="fa-solid fa-door-open text-rose-400 text-[10px] shrink-0"></i>
+                <span class="text-white/70 truncate">Doorstep &rarr; <span class="text-white font-medium">${tgt ? tgt.name : 'Next Room'}</span></span>
               </div>
-              <button onclick="deleteHotspot('${h.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
+              <div class="flex items-center space-x-0.5 ml-1 shrink-0">
+                <button onclick="armReposition('${h.id}')" title="Move hotspot" class="text-white/40 hover:text-rose-300 p-1 rounded transition">
+                  <i class="fa-solid fa-arrows-up-down-left-right text-[10px]"></i>
+                </button>
+                <button onclick="deleteHotspot('${h.id}')" title="Delete" class="text-white/40 hover:text-rose-400 p-1 rounded transition">
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                </button>
+              </div>
             `;
           }
           hsList.appendChild(row);
@@ -2457,6 +3182,30 @@
       toggleEditorDrawer();
     }
 
+    // Called from the drawer "Create New Property Tour" button directly (no modal needed)
+    function createNewTourFromDrawer() {
+      const title = prompt('New tour name (e.g. "Skyline Penthouse Beverly Hills"):');
+      if (!title || !title.trim()) return;
+      const location = prompt('Location / address:') || '';
+      const price = prompt('List price (e.g. $9,800,000):') || '';
+
+      const newTour = {
+        id: 'tour_' + Date.now(),
+        title: title.trim(),
+        location: location.trim(),
+        price: price.trim(),
+        heroImage: '',
+        scenes: [{ id: 'scene_' + Date.now(), name: 'Grand Entrance', imageSrc: '', hotspots: [] }]
+      };
+
+      appState.tours.push(newTour);
+      appState.activeTourId = newTour.id;
+      appState.activeSceneId = newTour.scenes[0].id;
+      saveAppStorage();
+      renderAllUI();
+      showToast(`Tour created: "${newTour.title}" — Upload your 360° images above.`);
+    }
+
     // ---------- ROOM GALLERY MODAL ----------
     function toggleSceneGalleryModal() {
       const modal = document.getElementById('modal-scene-gallery');
@@ -2497,29 +3246,41 @@
     }
 
     // ---------- STORAGE, IMPORT & EXPORT ----------
+    const STORAGE_KEY = 'razel_360_v4_tours';
+
     function saveAppStorage() {
       try {
-        localStorage.setItem('lumina_360_multi_tours_data', JSON.stringify(appState));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {
         console.warn("Storage quota limit reached (kept in active memory).");
       }
     }
 
     function loadAppStorage() {
-      const raw = localStorage.getItem('lumina_360_multi_tours_data');
+      const legacyKey = 'lumina_360_multi_tours_data';
+      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(legacyKey);
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
           if (parsed && parsed.tours && parsed.tours.length > 0) {
-            // Ensure both built-in showcases (Villa Lumina & Palm Royale) are accessible
+            // Always ensure built-in showcases use verified canonical code definitions to eliminate stale 404s
+            parsed.tours = parsed.tours.map(t => {
+              if (t.id === DEMO_PALM_ROYALE.id) return JSON.parse(JSON.stringify(DEMO_PALM_ROYALE));
+              if (t.id === DEMO_VILLA_LUMINA.id) return JSON.parse(JSON.stringify(DEMO_VILLA_LUMINA));
+              return t;
+            });
             if (!parsed.tours.some(t => t.id === DEMO_PALM_ROYALE.id)) {
               parsed.tours.push(DEMO_PALM_ROYALE);
             }
+            if (!parsed.tours.some(t => t.id === DEMO_VILLA_LUMINA.id)) {
+              parsed.tours.push(DEMO_VILLA_LUMINA);
+            }
             appState = parsed;
+            try { localStorage.removeItem(legacyKey); } catch (e) { }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
           }
         } catch (e) { console.error(e); }
       }
-      switchScene(appState.activeSceneId);
     }
 
     function exportCurrentTourJSON() {
@@ -2569,10 +3330,30 @@
     function renderLoop() {
       requestAnimationFrame(renderLoop);
 
-      // Automated Demo Guided Walkthrough camera rotation
-      if (isAutoDemoActive) {
-        lon += 0.08;
+      // Inertial coasting when releasing touch/mouse (light, not pan-like)
+      if (!isDragging) {
+        lonVelocity *= 0.88;
+        latVelocity *= 0.88;
+        const velMag = Math.abs(lonVelocity) + Math.abs(latVelocity);
+        if (velMag > 0.01) {
+          lon += lonVelocity * 0.016;
+          lat += latVelocity * 0.016;
+          targetLon = lon;
+          targetLat = lat;
+        }
       }
+
+      // Auto Demo: slow sweep. Lobby: gentle ambient drift
+      if (isAutoDemoActive) {
+        lon += 0.06;
+        targetLon = lon;
+      } else if (isLobbyActive && !isDragging) {
+        lon += 0.025;
+        targetLon = lon;
+      }
+
+      // No double interpolation - lon/lat are already direct
+      // Just clamp lat
 
       // Smooth Optical Zoom Inertia
       if (Math.abs(camera.fov - targetFov) > 0.05) {
@@ -2597,7 +3378,9 @@
       }
 
       // Check Crosshair Overlays & Animate Arrow Stem + Billboard Pop-ups
-      checkHotspotHover();
+      if (!isHomePageOpen) {
+        checkHotspotHover();
+      }
 
       // Stereoscopic split-screen rendering for Cardboard VR
       const w = window.innerWidth;

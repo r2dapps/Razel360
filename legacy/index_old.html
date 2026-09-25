@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VR Tour Studio Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; touch-action: manipulation; user-select: none; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+  </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 overflow-hidden">
+
+  <!-- ==================== HEADER BAR ==================== -->
+  <header class="fixed top-0 left-0 right-0 h-14 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 flex items-center justify-between z-30">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+        <i class="fa-solid fa-vr-cardboard"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-wide">Tour Studio Pro</h1>
+        <p class="text-[10px] text-slate-400" id="header-status">Editor Mode</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <button onclick="exportProjectJSON()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition">
+        <i class="fa-solid fa-download mr-1"></i> Export
+      </button>
+      <label class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 cursor-pointer transition">
+        <i class="fa-solid fa-upload mr-1"></i> Import
+        <input type="file" id="import-json" accept=".json" class="hidden" onchange="importProjectJSON(event)">
+      </label>
+      <button id="btn-toggle-mode" onclick="toggleTourMode()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-600/30 transition flex items-center">
+        <i class="fa-solid fa-play mr-1.5"></i> <span>Preview Tour</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN VIEWPORT & WORKSPACE ==================== -->
+  <div class="absolute inset-0 top-14 flex">
+    
+    <!-- LEFT SIDEBAR: Scene Manager & Portals -->
+    <aside id="sidebar" class="w-80 bg-slate-900/95 border-r border-slate-800 flex flex-col z-20 transition-all duration-300">
+      
+      <!-- Upload Box -->
+      <div class="p-3 border-b border-slate-800">
+        <label class="w-full py-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl cursor-pointer transition flex items-center justify-center space-x-2 text-xs font-bold">
+          <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+          <span>Add 360 Panorama (JPG/PNG)</span>
+          <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageBatch(event)">
+        </label>
+      </div>
+
+      <!-- Scenes List -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-2" id="scene-list"></div>
+
+      <!-- Hotspot & Item Tag Panel -->
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Interactive Hotspots</h3>
+          <span id="hotspot-count" class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-blue-400 font-mono">0</span>
+        </div>
+
+        <!-- Hotspot Type Switcher Tabs -->
+        <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-900 rounded-lg border border-slate-800">
+          <button id="tab-btn-portal" onclick="switchHotspotTab('portal')" class="py-1 px-2 text-[11px] font-bold rounded-md bg-blue-600 text-white transition flex items-center justify-center space-x-1 shadow">
+            <i class="fa-solid fa-door-open text-[10px]"></i>
+            <span>Doorway</span>
+          </button>
+          <button id="tab-btn-info" onclick="switchHotspotTab('info')" class="py-1 px-2 text-[11px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1">
+            <i class="fa-solid fa-tag text-[10px]"></i>
+            <span>Item / Price</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: Street View Doorway Portal Controls -->
+        <div id="panel-tab-portal" class="space-y-2">
+          <p class="text-[11px] text-slate-400">Connect to Room:</p>
+          <select id="portal-target-select" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 outline-none focus:border-blue-500"></select>
+          
+          <button id="btn-arm-portal" onclick="togglePlacementMode('portal')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <span id="portal-btn-text">Click to Place Portal</span>
+          </button>
+        </div>
+
+        <!-- TAB 2: Item Callout Controls -->
+        <div id="panel-tab-info" class="space-y-2 hidden">
+          <div>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Item Name / Title</label>
+            <input type="text" id="item-title-input" placeholder="e.g. Italian Leather Sofa" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-1.5 outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Price Tag (optional)</label>
+            <input type="text" id="item-price-input" placeholder="e.g. $1,450" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-1.5 outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Specs / Description</label>
+            <input type="text" id="item-desc-input" placeholder="e.g. Top-grain leather, walnut frame" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-1.5 outline-none focus:border-amber-500">
+          </div>
+          
+          <button id="btn-arm-info" onclick="togglePlacementMode('info')" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow">
+            <i class="fa-solid fa-tag"></i>
+            <span id="info-btn-text">Click to Place Item Tag</span>
+          </button>
+        </div>
+
+        <!-- Room Hotspots List -->
+        <div class="pt-2 border-t border-slate-850">
+          <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Hotspots in this room:</div>
+          <div id="room-hotspots-list" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 3D VIEWPORT CANVAS -->
+    <div class="flex-1 relative bg-black overflow-hidden" id="canvas-container">
+      
+      <!-- Placement Instruction Overlay -->
+      <div id="placement-alert" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-4 py-2 rounded-full shadow-2xl z-30 font-semibold flex items-center space-x-2 pointer-events-none">
+        <i class="fa-solid fa-circle-info animate-pulse"></i>
+        <span id="placement-alert-text">Click on the floor or doorway to set portal location</span>
+      </div>
+
+      <!-- Street View Style Reticle (Preview / VR Mode) -->
+      <div id="vr-reticle-container" class="hidden absolute inset-0 m-auto w-12 h-12 pointer-events-none z-30 flex items-center justify-center">
+        <div id="reticle-dot" class="w-2.5 h-2.5 bg-white rounded-full shadow transition-transform duration-100"></div>
+        <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
+          <path id="dwell-ring" class="text-blue-500 transition-all duration-75" stroke-dasharray="100" stroke-dashoffset="100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+      </div>
+
+      <!-- VR Screen Split Line -->
+      <div id="cardboard-divider" class="hidden absolute top-0 bottom-0 left-1/2 w-0.5 bg-slate-800 z-30 pointer-events-none -translate-x-1/2"></div>
+
+      <!-- Viewer Controls Overlay -->
+      <div id="viewer-hud" class="hidden absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur border border-slate-700/80 px-4 py-2 rounded-2xl shadow-2xl flex items-center space-x-3 z-30">
+        <button id="btn-gyro" onclick="toggleGyroscope()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-600 transition flex items-center">
+          <i class="fa-solid fa-compass mr-1.5 text-blue-400"></i> <span id="gyro-text">Enable Tilt</span>
+        </button>
+        <div class="h-4 w-px bg-slate-700"></div>
+        <button id="btn-cardboard" onclick="toggleCardboardVR()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl shadow transition flex items-center">
+          <i class="fa-solid fa-vr-cardboard mr-1.5"></i> <span id="cardboard-text">Cardboard VR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Walk / Fade Transition Overlay -->
+  <div id="transition-curtain" class="fixed inset-0 bg-black opacity-0 pointer-events-none z-50 transition-opacity duration-300"></div>
+
+  <!-- ==================== THREE.JS & APPLICATION LOGIC ==================== -->
+  <script>
+    // ---------- Tour Data State ----------
+    let tour = {
+      title: "House Interior Tour",
+      scenes: [],        // [{ id, name, imageSrc, hotspots: [{ id, targetSceneId, x, y, z }] }]
+      activeSceneId: null
+    };
+
+    let isPreviewMode = false;
+    let isPlacementArmed = false;
+    let isCardboardVR = false;
+    let isGyroActive = false;
+
+    // Three.js Core
+    let scene, camera, renderer, sphereMesh;
+    let portalMeshes = [];
+    let infoHotspotMeshes = [];
+    let placementType = 'portal'; // 'portal' or 'info'
+    let lon = 0, lat = 0, phi = 0, theta = 0;
+    let isDragging = false, dragStartX = 0, dragStartY = 0, dragStartLon = 0, dragStartLat = 0;
+
+    // Gaze Dwell Interaction
+    let targetedPortal = null;
+    let dwellStartTime = 0;
+    const DWELL_TIMEOUT_MS = 1400;
+
+    // Gyro
+    let deviceOrientation = { alpha: 0, beta: 0, gamma: 0 };
+
+    window.onload = function() {
+      initThreeEngine();
+      loadSavedTour();
+      renderSceneSidebar();
+      window.addEventListener('resize', onWindowResize);
+      requestAnimationFrame(renderLoop);
+    };
+
+    // ---------- Fixed Color Pipeline Three.js Initialization ----------
+    function initThreeEngine() {
+      const container = document.getElementById('canvas-container');
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1500);
+      camera.target = new THREE.Vector3(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // CRITICAL FIX: Explicit sRGB Output Encoding prevents dark images
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.NoToneMapping; // Prevent tone mapping from dulling ambient photos
+
+      container.appendChild(renderer.domElement);
+
+      // Inverted 360 Panorama Sphere
+      const sphereGeo = new THREE.SphereGeometry(500, 60, 40);
+      sphereGeo.scale(-1, 1, 1);
+      
+      const sphereMat = new THREE.MeshBasicMaterial({
+        color: 0x111827,
+        toneMapped: false // Keeps colors 1:1 true to photo exposure
+      });
+      sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      scene.add(sphereMesh);
+
+      // Event listeners for dragging
+      const dom = renderer.domElement;
+      dom.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      dom.addEventListener('wheel', onMouseWheel, { passive: true });
+      dom.addEventListener('click', onCanvasClick);
+    }
+
+    // ---------- Image Ingestion & sRGB Texture Loading ----------
+    function handleImageBatch(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      let remaining = files.length;
+      files.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const newScene = {
+            id: 'scene_' + Date.now() + '_' + idx,
+            name: file.name.replace(/\.[^/.]+$/, "") || `Room ${tour.scenes.length + 1}`,
+            imageSrc: e.target.result,
+            hotspots: []
+          };
+          tour.scenes.push(newScene);
+          remaining--;
+          if (remaining === 0) {
+            if (!tour.activeSceneId) switchScene(newScene.id);
+            saveTour();
+            renderSceneSidebar();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = '';
+    }
+
+    function switchScene(sceneId, isWalking = false) {
+      const targetScene = tour.scenes.find(s => s.id === sceneId);
+      if (!targetScene) return;
+
+      const performSwap = () => {
+        tour.activeSceneId = sceneId;
+        
+        // Load Texture with sRGB encoding
+        const loader = new THREE.TextureLoader();
+        loader.load(targetScene.imageSrc, (texture) => {
+          texture.encoding = THREE.sRGBEncoding; // Correct gamma conversion
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          sphereMesh.material.map = texture;
+          sphereMesh.material.color.setHex(0xffffff);
+          sphereMesh.material.needsUpdate = true;
+        });
+
+        rebuildPortals();
+        renderSceneSidebar();
+        updateTargetSelector();
+
+        if (isWalking) {
+          document.getElementById('transition-curtain').style.opacity = '0';
+        }
+      };
+
+      if (isWalking) {
+        // Street View glide transition
+        document.getElementById('transition-curtain').style.opacity = '1';
+        setTimeout(performSwap, 300);
+      } else {
+        performSwap();
+      }
+    }
+
+    // ---------- Interactive Hotspots Engine (Portals & 3D Item Callouts) ----------
+    function createCalloutTexture(title, price, description) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      // Frosted Glass Dark Badge Background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+      if (ctx.roundRect) {
+        ctx.roundRect(10, 10, 492, 236, 24);
+      } else {
+        ctx.rect(10, 10, 492, 236);
+      }
+      ctx.fill();
+
+      // Border Highlight
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      const hasPrice = price && price.trim().length > 0;
+
+      // Price Tag Badge (Top Right)
+      if (hasPrice) {
+        ctx.fillStyle = '#10b981';
+        if (ctx.roundRect) {
+          ctx.roundRect(330, 24, 150, 46, 12);
+        } else {
+          ctx.rect(330, 24, 150, 46);
+        }
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(price.trim(), 405, 47);
+      }
+
+      // Item Title
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const titleMaxWidth = hasPrice ? 285 : 440;
+
+      let displayTitle = title || 'Featured Item';
+      while (displayTitle.length > 0 && ctx.measureText(displayTitle).width > titleMaxWidth) {
+        displayTitle = displayTitle.slice(0, -1);
+      }
+      if (displayTitle !== (title || 'Featured Item')) displayTitle += '...';
+      ctx.fillText(displayTitle, 36, 58);
+
+      // Divider Line
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(36, 92);
+      ctx.lineTo(476, 92);
+      ctx.stroke();
+
+      // Description / Details Text
+      if (description && description.trim()) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textBaseline = 'alphabetic';
+
+        const words = description.split(' ');
+        let line = '';
+        let y = 136;
+        const lineHeight = 32;
+        const maxLines = 3;
+        let linesDrawn = 0;
+
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > 440 && n > 0) {
+            ctx.fillText(line, 36, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+            linesDrawn++;
+            if (linesDrawn >= maxLines - 1 && n < words.length - 1) {
+              let lastLine = line;
+              for (let k = n + 1; k < words.length; k++) lastLine += words[k] + ' ';
+              while (lastLine.length > 0 && ctx.measureText(lastLine + '...').width > 440) {
+                lastLine = lastLine.slice(0, -1);
+              }
+              ctx.fillText(lastLine + '...', 36, y);
+              line = '';
+              break;
+            }
+          } else {
+            line = testLine;
+          }
+        }
+        if (line) ctx.fillText(line, 36, y);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+
+    function createItemCallout(hs) {
+      const group = new THREE.Group();
+      group.position.set(hs.x, hs.y, hs.z);
+
+      // 1. Visible 3D Amber Beacon on the item
+      const beaconGeo = new THREE.SphereGeometry(7, 16, 16);
+      const beaconMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+      group.add(beacon);
+
+      // Outer accent glowing ring
+      const ringGeo = new THREE.RingGeometry(9, 13, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xfbbf24,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      group.add(ring);
+
+      // Invisible larger hit sphere for smooth, forgiving gaze raycasting
+      const hitGeo = new THREE.SphereGeometry(24, 8, 8);
+      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+      const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+      group.add(hitMesh);
+
+      // 2. The Floating Information Card (Initially invisible, depthTest: false prevents occlusion)
+      const cardTexture = createCalloutTexture(hs.title, hs.price, hs.description);
+      const cardGeo = new THREE.PlaneGeometry(64, 32);
+      const cardMat = new THREE.MeshBasicMaterial({
+        map: cardTexture,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide,
+        depthTest: false
+      });
+
+      const cardMesh = new THREE.Mesh(cardGeo, cardMat);
+      cardMesh.position.set(0, 26, 0); // Floats 26 units above the beacon
+      cardMesh.renderOrder = 999;
+      group.add(cardMesh);
+
+      group.userData = {
+        id: hs.id,
+        type: 'info',
+        beacon: beacon,
+        ring: ring,
+        hitBox: hitMesh,
+        card: cardMesh
+      };
+
+      scene.add(group);
+      infoHotspotMeshes.push(group);
+    }
+
+    function createPortalMesh(hs) {
+      const portalGroup = new THREE.Group();
+
+      // 1. Perspective Floor Ring
+      const ringGeo = new THREE.RingGeometry(18, 24, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x3b82f6,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2; // Lie flat on floor
+      portalGroup.add(ringMesh);
+
+      // 2. Center Direction Arrow/Chevron
+      const arrowGeo = new THREE.ConeGeometry(8, 16, 3);
+      const arrowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+      const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
+      arrowMesh.rotation.x = Math.PI / 2;
+      portalGroup.add(arrowMesh);
+
+      // Position on 3D spherical shell
+      portalGroup.position.set(hs.x, hs.y, hs.z);
+      portalGroup.lookAt(0, 0, 0);
+
+      portalGroup.userData = { id: hs.id, type: 'portal', targetSceneId: hs.targetSceneId };
+      scene.add(portalGroup);
+      portalMeshes.push(portalGroup);
+    }
+
+    function rebuildHotspots() {
+      // Clear previous portals
+      portalMeshes.forEach(m => scene.remove(m));
+      portalMeshes = [];
+
+      // Clear previous item callouts and dispose textures
+      infoHotspotMeshes.forEach(m => {
+        if (m.userData.card && m.userData.card.material && m.userData.card.material.map) {
+          m.userData.card.material.map.dispose();
+        }
+        scene.remove(m);
+      });
+      infoHotspotMeshes = [];
+
+      const current = tour.scenes.find(s => s.id === tour.activeSceneId);
+      if (!current || !current.hotspots) {
+        renderHotspotList();
+        return;
+      }
+
+      current.hotspots.forEach(hs => {
+        if (hs.type === 'info') {
+          createItemCallout(hs);
+        } else {
+          createPortalMesh(hs);
+        }
+      });
+
+      renderHotspotList();
+    }
+
+    function rebuildPortals() {
+      rebuildHotspots();
+    }
+
+    // ---------- Hotspot Tabs & Placement Controls ----------
+    function switchHotspotTab(tab) {
+      placementType = tab;
+      const portalTabBtn = document.getElementById('tab-btn-portal');
+      const infoTabBtn = document.getElementById('tab-btn-info');
+      const portalPanel = document.getElementById('panel-tab-portal');
+      const infoPanel = document.getElementById('panel-tab-info');
+
+      if (tab === 'portal') {
+        portalTabBtn.className = "py-1 px-2 text-[11px] font-bold rounded-md bg-blue-600 text-white transition flex items-center justify-center space-x-1 shadow";
+        infoTabBtn.className = "py-1 px-2 text-[11px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1";
+        portalPanel.classList.remove('hidden');
+        infoPanel.classList.add('hidden');
+      } else {
+        infoTabBtn.className = "py-1 px-2 text-[11px] font-bold rounded-md bg-amber-600 text-white transition flex items-center justify-center space-x-1 shadow";
+        portalTabBtn.className = "py-1 px-2 text-[11px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1";
+        infoPanel.classList.remove('hidden');
+        portalPanel.classList.add('hidden');
+      }
+      cancelPlacement();
+    }
+
+    function togglePlacementMode(type) {
+      if (type) placementType = type;
+
+      if (placementType === 'portal' && tour.scenes.length < 2) {
+        alert("Upload at least two rooms to link them together.");
+        return;
+      }
+      if (tour.scenes.length === 0) {
+        alert("Upload a 360 panorama room image first.");
+        return;
+      }
+
+      isPlacementArmed = !isPlacementArmed;
+      const portalBtn = document.getElementById('btn-arm-portal');
+      const infoBtn = document.getElementById('btn-arm-info');
+      const alertBox = document.getElementById('placement-alert');
+      const alertText = document.getElementById('placement-alert-text');
+
+      if (isPlacementArmed) {
+        if (placementType === 'portal') {
+          if (portalBtn) {
+            portalBtn.classList.replace('bg-blue-600', 'bg-rose-600');
+            portalBtn.classList.replace('hover:bg-blue-500', 'hover:bg-rose-500');
+            document.getElementById('portal-btn-text').innerText = "Cancel Placement";
+          }
+          if (alertBox) {
+            alertBox.className = "absolute top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-4 py-2 rounded-full shadow-2xl z-30 font-semibold flex items-center space-x-2 pointer-events-none";
+            alertText.innerText = "Click on the floor or doorway to set portal location";
+            alertBox.classList.remove('hidden');
+          }
+        } else {
+          if (infoBtn) {
+            infoBtn.classList.replace('bg-amber-600', 'bg-rose-600');
+            infoBtn.classList.replace('hover:bg-amber-500', 'hover:bg-rose-500');
+            document.getElementById('info-btn-text').innerText = "Cancel Placement";
+          }
+          if (alertBox) {
+            alertBox.className = "absolute top-4 left-1/2 -translate-x-1/2 bg-amber-600 text-white text-xs px-4 py-2 rounded-full shadow-2xl z-30 font-semibold flex items-center space-x-2 pointer-events-none";
+            alertText.innerText = "Click on any furniture/item to place callout badge";
+            alertBox.classList.remove('hidden');
+          }
+        }
+      } else {
+        cancelPlacement();
+      }
+    }
+
+    function cancelPlacement() {
+      isPlacementArmed = false;
+      const portalBtn = document.getElementById('btn-arm-portal');
+      const infoBtn = document.getElementById('btn-arm-info');
+      const alertBox = document.getElementById('placement-alert');
+
+      if (portalBtn) {
+        portalBtn.classList.replace('bg-rose-600', 'bg-blue-600');
+        portalBtn.classList.replace('hover:bg-rose-500', 'hover:bg-blue-500');
+        document.getElementById('portal-btn-text').innerText = "Click to Place Portal";
+      }
+      if (infoBtn) {
+        infoBtn.classList.replace('bg-rose-600', 'bg-amber-600');
+        infoBtn.classList.replace('hover:bg-rose-500', 'hover:bg-amber-500');
+        document.getElementById('info-btn-text').innerText = "Click to Place Item Tag";
+      }
+      if (alertBox) {
+        alertBox.classList.add('hidden');
+      }
+    }
+
+    function onCanvasClick(event) {
+      if (!isPlacementArmed || isPreviewMode) return;
+
+      const container = document.getElementById('canvas-container');
+      const rect = container.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / container.clientWidth) * 2 - 1,
+        -((event.clientY - rect.top) / container.clientHeight) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(sphereMesh);
+
+      if (hits.length > 0) {
+        const point = hits[0].point.clone().normalize().multiplyScalar(400); // 400 units inward
+        const current = tour.scenes.find(s => s.id === tour.activeSceneId);
+        if (!current) return;
+        if (!current.hotspots) current.hotspots = [];
+
+        if (placementType === 'info') {
+          const title = document.getElementById('item-title-input').value.trim() || 'Featured Item';
+          const price = document.getElementById('item-price-input').value.trim();
+          const desc = document.getElementById('item-desc-input').value.trim();
+
+          current.hotspots.push({
+            id: 'item_' + Date.now(),
+            type: 'info',
+            title: title,
+            price: price,
+            description: desc,
+            x: point.x, y: point.y, z: point.z
+          });
+        } else {
+          const targetSceneId = document.getElementById('portal-target-select').value;
+          current.hotspots.push({
+            id: 'hs_' + Date.now(),
+            type: 'portal',
+            targetSceneId: targetSceneId,
+            x: point.x, y: point.y, z: point.z
+          });
+        }
+
+        saveTour();
+        rebuildHotspots();
+        cancelPlacement();
+      }
+    }
+
+    function deleteHotspot(hsId) {
+      const current = tour.scenes.find(s => s.id === tour.activeSceneId);
+      if (!current || !current.hotspots) return;
+      current.hotspots = current.hotspots.filter(h => h.id !== hsId);
+      saveTour();
+      rebuildHotspots();
+    }
+
+    function renderHotspotList() {
+      const container = document.getElementById('room-hotspots-list');
+      const countEl = document.getElementById('hotspot-count');
+      if (!container) return;
+
+      const current = tour.scenes.find(s => s.id === tour.activeSceneId);
+      if (!current || !current.hotspots || current.hotspots.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-500 italic py-1">No hotspots placed in this room.</p>`;
+        if (countEl) countEl.innerText = "0";
+        return;
+      }
+
+      if (countEl) countEl.innerText = current.hotspots.length;
+      container.innerHTML = '';
+
+      current.hotspots.forEach(hs => {
+        const itemRow = document.createElement('div');
+        itemRow.className = "flex items-center justify-between p-1.5 bg-slate-900/80 rounded border border-slate-800 text-[11px]";
+
+        if (hs.type === 'info') {
+          const priceText = hs.price ? `<span class="text-emerald-400 font-bold ml-1">${hs.price}</span>` : '';
+          itemRow.innerHTML = `
+            <div class="flex items-center space-x-1.5 overflow-hidden">
+              <i class="fa-solid fa-tag text-amber-400 text-[10px] shrink-0"></i>
+              <span class="text-slate-200 truncate font-medium">${hs.title || 'Item'}</span>
+              ${priceText}
+            </div>
+            <button onclick="deleteHotspot('${hs.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1 transition" title="Delete tag">
+              <i class="fa-solid fa-trash text-[10px]"></i>
+            </button>
+          `;
+        } else {
+          const targetScene = tour.scenes.find(s => s.id === hs.targetSceneId);
+          const targetName = targetScene ? targetScene.name : 'Unknown Room';
+          itemRow.innerHTML = `
+            <div class="flex items-center space-x-1.5 overflow-hidden">
+              <i class="fa-solid fa-door-open text-blue-400 text-[10px] shrink-0"></i>
+              <span class="text-slate-300 truncate">To: <span class="font-medium text-slate-100">${targetName}</span></span>
+            </div>
+            <button onclick="deleteHotspot('${hs.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1 transition" title="Delete portal">
+              <i class="fa-solid fa-trash text-[10px]"></i>
+            </button>
+          `;
+        }
+
+        container.appendChild(itemRow);
+      });
+    }
+
+    // ---------- 3D Billboard Crosshair Hover Animation Loop ----------
+    function checkItemHover() {
+      if (infoHotspotMeshes.length === 0) return;
+
+      let activeGroup = null;
+
+      if (isPreviewMode) {
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+        const hitTargets = infoHotspotMeshes.map(g => g.userData.hitBox);
+        const hits = raycaster.intersectObjects(hitTargets);
+
+        if (hits.length > 0) {
+          activeGroup = hits[0].object.parent;
+        }
+      }
+
+      infoHotspotMeshes.forEach(group => {
+        const card = group.userData.card;
+        const ring = group.userData.ring;
+
+        // Billboard: Always orient directly toward camera
+        card.lookAt(camera.position);
+        if (ring) ring.lookAt(camera.position);
+
+        if (isPreviewMode && group === activeGroup) {
+          // Crosshair is hovering on this item: Fade In smoothly
+          card.material.opacity = THREE.MathUtils.lerp(card.material.opacity, 1.0, 0.18);
+          card.scale.lerp(new THREE.Vector3(1.05, 1.05, 1.05), 0.18);
+          if (ring) ring.scale.lerp(new THREE.Vector3(1.25, 1.25, 1.25), 0.18);
+        } else {
+          // Crosshair moved away or editor mode: Fade Out smoothly
+          card.material.opacity = THREE.MathUtils.lerp(card.material.opacity, 0.0, 0.15);
+          card.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.15);
+          if (ring) ring.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.15);
+        }
+      });
+
+      // Reticle feedback for item hover
+      const dot = document.getElementById('reticle-dot');
+      if (dot && isPreviewMode && !targetedPortal) {
+        if (activeGroup) {
+          dot.classList.add('bg-amber-400', 'scale-125');
+        } else {
+          dot.classList.remove('bg-amber-400', 'scale-125');
+        }
+      }
+    }
+
+    // ---------- Gaze-and-Dwell VR Teleport Engine ----------
+    function checkGazeTeleport() {
+      if (!isPreviewMode || portalMeshes.length === 0) {
+        resetDwellTimer();
+        return;
+      }
+
+      // Cast ray from viewport center
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+      const hits = raycaster.intersectObjects(portalMeshes, true);
+
+      const dwellRing = document.getElementById('dwell-ring');
+      const dot = document.getElementById('reticle-dot');
+
+      if (hits.length > 0) {
+        // Traverse to root group
+        let rootObj = hits[0].object;
+        while (rootObj.parent && rootObj.parent !== scene) rootObj = rootObj.parent;
+
+        const targetId = rootObj.userData.targetSceneId;
+        if (!targetId) return;
+
+        if (targetedPortal !== targetId) {
+          targetedPortal = targetId;
+          dwellStartTime = performance.now();
+          dot.classList.add('scale-150', 'bg-blue-400');
+        } else {
+          const elapsed = performance.now() - dwellStartTime;
+          const progress = Math.min(elapsed / DWELL_TIMEOUT_MS, 1);
+          
+          dwellRing.style.strokeDashoffset = 100 - (progress * 100);
+
+          if (elapsed >= DWELL_TIMEOUT_MS) {
+            resetDwellTimer();
+            switchScene(targetId, true);
+          }
+        }
+      } else {
+        resetDwellTimer();
+      }
+    }
+
+    function resetDwellTimer() {
+      targetedPortal = null;
+      dwellStartTime = 0;
+      document.getElementById('dwell-ring').style.strokeDashoffset = 100;
+      document.getElementById('reticle-dot').classList.remove('scale-150', 'bg-blue-400');
+    }
+
+    // ---------- Mobile Tilt & Gyroscope Controls ----------
+    function toggleGyroscope() {
+      if (!isGyroActive) {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(state => {
+            if (state === 'granted') bindOrientationListener();
+            else alert("Gyroscope access denied.");
+          }).catch(console.error);
+        } else {
+          bindOrientationListener();
+        }
+      } else {
+        unbindOrientationListener();
+      }
+    }
+
+    function bindOrientationListener() {
+      window.addEventListener('deviceorientation', handleOrientationEvent, true);
+      isGyroActive = true;
+      document.getElementById('btn-gyro').classList.add('bg-blue-600', 'text-white');
+      document.getElementById('gyro-text').innerText = "Disable Tilt";
+    }
+
+    function unbindOrientationListener() {
+      window.removeEventListener('deviceorientation', handleOrientationEvent, true);
+      isGyroActive = false;
+      document.getElementById('btn-gyro').classList.remove('bg-blue-600', 'text-white');
+      document.getElementById('gyro-text').innerText = "Enable Tilt";
+    }
+
+    function handleOrientationEvent(e) {
+      if (!isGyroActive || !isPreviewMode) return;
+      deviceOrientation.alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+      deviceOrientation.beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
+      deviceOrientation.gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+
+      // Cardboard-calibrated Euler to Quaternion transformation
+      const euler = new THREE.Euler(deviceOrientation.beta, deviceOrientation.alpha, -deviceOrientation.gamma, 'YXZ');
+      camera.quaternion.setFromEuler(euler);
+      camera.quaternion.multiply(new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5))); // Fix forward alignment
+    }
+
+    // ---------- Cardboard Stereoscopic Mode ----------
+    function toggleCardboardVR() {
+      isCardboardVR = !isCardboardVR;
+      const divider = document.getElementById('cardboard-divider');
+      const btn = document.getElementById('btn-cardboard');
+
+      if (isCardboardVR) {
+        divider.classList.remove('hidden');
+        btn.classList.add('bg-indigo-700');
+        document.getElementById('cardboard-text').innerText = "Single Screen";
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        divider.classList.add('hidden');
+        btn.classList.remove('bg-indigo-700');
+        document.getElementById('cardboard-text').innerText = "Cardboard VR";
+        if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      }
+      onWindowResize();
+    }
+
+    // ---------- UI State, Save & Export ----------
+    function toggleTourMode() {
+      if (tour.scenes.length === 0) {
+        alert("Upload at least one 360 panorama image first.");
+        return;
+      }
+      isPreviewMode = !isPreviewMode;
+      const sidebar = document.getElementById('sidebar');
+      const hud = document.getElementById('viewer-hud');
+      const reticle = document.getElementById('vr-reticle-container');
+      const modeBtn = document.getElementById('btn-toggle-mode');
+      const headerStatus = document.getElementById('header-status');
+
+      if (isPreviewMode) {
+        if (isPlacementArmed) togglePlacementMode();
+        sidebar.classList.add('-ml-80');
+        hud.classList.remove('hidden');
+        reticle.classList.remove('hidden');
+        modeBtn.innerHTML = `<i class="fa-solid fa-pen-ruler mr-1.5"></i> Edit Tour`;
+        modeBtn.className = "px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition flex items-center";
+        headerStatus.innerText = "Walkthrough Preview";
+      } else {
+        sidebar.classList.remove('-ml-80');
+        hud.classList.add('hidden');
+        reticle.classList.add('hidden');
+        if (isCardboardVR) toggleCardboardVR();
+        if (isGyroActive) unbindOrientationListener();
+        modeBtn.innerHTML = `<i class="fa-solid fa-play mr-1.5"></i> Preview Tour`;
+        modeBtn.className = "px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-600/30 transition flex items-center";
+        headerStatus.innerText = "Editor Mode";
+      }
+      onWindowResize();
+    }
+
+    function renderSceneSidebar() {
+      const container = document.getElementById('scene-list');
+      container.innerHTML = '';
+
+      tour.scenes.forEach(s => {
+        const isActive = s.id === tour.activeSceneId;
+        const card = document.createElement('div');
+        card.className = `p-2.5 rounded-xl border transition flex items-center justify-between cursor-pointer ${isActive ? 'bg-blue-600/10 border-blue-500 shadow-md' : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80'}`;
+        card.onclick = () => switchScene(s.id);
+
+        card.innerHTML = `
+          <div class="flex items-center space-x-2.5 overflow-hidden">
+            <div class="w-10 h-8 rounded-lg bg-cover bg-center shrink-0 border border-slate-700" style="background-image: url('${s.imageSrc}')"></div>
+            <input type="text" value="${s.name}" onclick="event.stopPropagation()" onchange="renameScene('${s.id}', this.value)" class="bg-transparent text-xs font-bold text-slate-200 outline-none w-32 border-b border-transparent focus:border-blue-400">
+          </div>
+          <button onclick="event.stopPropagation(); deleteScene('${s.id}')" class="text-slate-500 hover:text-rose-400 p-1 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+        `;
+        container.appendChild(card);
+      });
+      updateTargetSelector();
+      renderHotspotList();
+    }
+
+    function renameScene(id, newName) {
+      const sc = tour.scenes.find(s => s.id === id);
+      if (sc) { sc.name = newName; saveTour(); updateTargetSelector(); }
+    }
+
+    function deleteScene(id) {
+      if (tour.scenes.length <= 1) { alert("You must keep at least one room."); return; }
+      tour.scenes = tour.scenes.filter(s => s.id !== id);
+      tour.scenes.forEach(s => s.hotspots = s.hotspots.filter(h => h.targetSceneId !== id));
+      if (tour.activeSceneId === id) switchScene(tour.scenes[0].id);
+      saveTour();
+      renderSceneSidebar();
+      rebuildHotspots();
+    }
+
+    function updateTargetSelector() {
+      const select = document.getElementById('portal-target-select');
+      select.innerHTML = '';
+      tour.scenes.filter(s => s.id !== tour.activeSceneId).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = s.name;
+        select.appendChild(opt);
+      });
+    }
+
+    function saveTour() {
+      try {
+        localStorage.setItem('vr_tour_production_data', JSON.stringify(tour));
+      } catch(e) {
+        console.warn("Storage quota exceeded (images too high-res for LocalStorage). Tour will remain in memory.");
+      }
+    }
+
+    function loadSavedTour() {
+      const raw = localStorage.getItem('vr_tour_production_data');
+      if (raw) {
+        try {
+          tour = JSON.parse(raw);
+          if (tour.scenes.length > 0) switchScene(tour.scenes[0].id);
+        } catch(e) { console.error(e); }
+      }
+    }
+
+    function exportProjectJSON() {
+      const blob = new Blob([JSON.stringify(tour)], { type: "application/json" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `tour_project_${Date.now()}.json`;
+      a.click();
+    }
+
+    function importProjectJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          tour = JSON.parse(e.target.result);
+          if (tour.scenes.length > 0) switchScene(tour.scenes[0].id);
+          saveTour();
+          renderSceneSidebar();
+        } catch (err) { alert("Invalid project JSON."); }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ---------- Drag Controls & Render Loop ----------
+    function onPointerDown(e) {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragStartLon = lon;
+      dragStartLat = lat;
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging || isGyroActive) return;
+      lon = (dragStartX - e.clientX) * 0.15 + dragStartLon;
+      lat = (e.clientY - dragStartY) * 0.15 + dragStartLat;
+    }
+
+    function onPointerUp() { isDragging = false; }
+    function onMouseWheel(e) {
+      camera.fov = THREE.MathUtils.clamp(camera.fov + e.deltaY * 0.05, 30, 95);
+      camera.updateProjectionMatrix();
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('canvas-container');
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+
+      // Manual orientation rotation if gyro is inactive
+      if (!isGyroActive) {
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+
+        const target = new THREE.Vector3();
+        target.x = 500 * Math.sin(phi) * Math.cos(theta);
+        target.y = 500 * Math.cos(phi);
+        target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(target);
+      }
+
+      // Check Crosshair Hover for 3D Item Billboard Callouts
+      checkItemHover();
+
+      // Check Gaze Intersection for Google Street View teleportation
+      checkGazeTeleport();
+
+      // Stereoscopic split-screen rendering for Cardboard
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      if (isCardboardVR) {
+        renderer.setScissorTest(true);
+        
+        // Left Eye
+        renderer.setViewport(0, 0, w / 2, h);
+        renderer.setScissor(0, 0, w / 2, h);
+        camera.aspect = (w / 2) / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+
+        // Right Eye
+        renderer.setViewport(w / 2, 0, w / 2, h);
+        renderer.setScissor(w / 2, 0, w / 2, h);
+        camera.aspect = (w / 2) / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+
+        renderer.setScissorTest(false);
+      } else {
+        renderer.setViewport(0, 0, w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+      }
+    }
+  </script>
+</body>
+</html>
