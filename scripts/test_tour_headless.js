@@ -114,6 +114,47 @@ requiredScenes.forEach(sceneId => {
   }
 });
 
+// Validate Demo 2: The Palm Royale Estate (8 Rooms)
+const tour2Match = scriptCode.match(/const DEMO_PALM_ROYALE = (\{[\s\S]*?\n    \};)/);
+assert(!!tour2Match, 'DEMO_PALM_ROYALE schema defined');
+
+let demoPalmRoyale = null;
+try {
+  demoPalmRoyale = eval('(' + tour2Match[1].replace(/;\s*$/, '') + ')');
+} catch (e) {
+  console.error('Failed to parse DEMO_PALM_ROYALE:', e);
+}
+
+assert(!!demoPalmRoyale && demoPalmRoyale.scenes && demoPalmRoyale.scenes.length === 8, 'Demo 2 Palm Royale has exactly 8 interconnected rooms');
+
+const requiredScenesTour2 = [
+  'scene_royale_exterior',
+  'scene_royale_foyer',
+  'scene_royale_living',
+  'scene_royale_dining',
+  'scene_royale_kitchen',
+  'scene_royale_bedroom',
+  'scene_royale_terrace',
+  'scene_royale_pool'
+];
+
+requiredScenesTour2.forEach(sceneId => {
+  const scene = demoPalmRoyale.scenes.find(s => s.id === sceneId);
+  assert(!!scene, `Tour 2 Scene '${sceneId}' is registered`);
+  if (scene) {
+    assert(scene.hotspots && scene.hotspots.length > 0, `Tour 2 Scene '${sceneId}' has active hotspots (${scene.hotspots ? scene.hotspots.length : 0})`);
+
+    const normalizedRelPath = scene.imageSrc.replace(/^\.\//, '').replace(/\//g, path.sep);
+    const absImagePath = path.join(ROOT_DIR, normalizedRelPath);
+    const imageExists = fs.existsSync(absImagePath);
+    assert(imageExists, `Image asset exists at disk path: ${normalizedRelPath}`);
+    if (imageExists) {
+      const stats = fs.statSync(absImagePath);
+      assert(stats.size > 500000, `Image asset '${path.basename(absImagePath)}' is high-res (${Math.round(stats.size / 1024)} KB)`);
+    }
+  }
+});
+
 // 5. Test Export / Import JSON Lifecycle
 console.log('\n\x1b[36m[5/6] Testing JSON Export / Import Validation...\x1b[0m');
 const exportPayload = {

@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-neutral-950 text-slate-100 antialiased select-none">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Razel 360 | Luxury Virtual Showcase</title>
-  
+
   <!-- Favicon (Inline VR Cardboard Headset SVG with Red Accent) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M20.5 6h-17C2.1 6 1 7.1 1 8.5v7C1 16.9 2.1 18 3.5 18h4.8l2.2-3.3c.4-.6 1.1-1 1.8-1s1.4.4 1.8 1l2.2 3.3h4.2c1.4 0 2.5-1.1 2.5-2.5v-7c0-1.4-1.1-2.5-2.5-2.5zm-14 7c-1.4 0-2.5-1.1-2.5-2.5S5.1 8 6.5 8s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zm11 0c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M20.5 6h-17C2.1 6 1 7.1 1 8.5v7C1 16.9 2.1 18 3.5 18h4.8l2.2-3.3c.4-.6 1.1-1 1.8-1s1.4.4 1.8 1l2.2 3.3h4.2c1.4 0 2.5-1.1 2.5-2.5v-7c0-1.4-1.1-2.5-2.5-2.5zm-14 7c-1.4 0-2.5-1.1-2.5-2.5S5.1 8 6.5 8s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zm11 0c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z'/%3E%3C/svg%3E">
 
   <!-- Architectural Typography (Outfit & Plus Jakarta Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Three.js r128 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -26,9 +31,11 @@
       overflow: hidden;
       touch-action: manipulation;
     }
+
     .font-display {
       font-family: 'Outfit', sans-serif;
     }
+
     /* Unified Monochromatic Glassmorphism with Red Accent Highlights */
     .glass-frosted {
       background: rgba(14, 18, 27, 0.65);
@@ -37,6 +44,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.85);
     }
+
     .glass-button {
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(16px);
@@ -45,32 +53,50 @@
       color: #ffffff;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     .glass-button:hover {
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.3);
     }
+
     .glass-active {
       background: rgba(255, 255, 255, 0.18);
       border-color: rgba(239, 68, 68, 0.8) !important;
       box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
     }
+
     .red-ink-badge {
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #f87171;
     }
+
     /* Sleek Scrollbar */
-    ::-webkit-scrollbar { width: 3px; height: 3px; }
-    ::-webkit-scrollbar-track { background: rgba(10, 14, 22, 0.4); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(239, 68, 68, 0.6); }
+    ::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 14, 22, 0.4);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(239, 68, 68, 0.6);
+    }
   </style>
 </head>
 
 <body class="h-full w-full bg-neutral-950 text-slate-100 overflow-hidden relative">
 
   <!-- ==================== 0. INITIAL PRELOADER SPINNER ==================== -->
-  <div id="initial-preloader" class="fixed inset-0 z-50 bg-neutral-950 flex flex-col items-center justify-center transition-opacity duration-500">
+  <div id="initial-preloader"
+    class="fixed inset-0 z-50 bg-neutral-950 flex flex-col items-center justify-center transition-opacity duration-500">
     <div class="relative w-16 h-16 mb-4 flex items-center justify-center">
       <div class="absolute inset-0 rounded-full border-2 border-white/10 border-t-rose-500 animate-spin"></div>
       <i class="fa-solid fa-vr-cardboard text-xl text-white"></i>
@@ -86,46 +112,58 @@
   <div id="canvas-container" class="fixed inset-0 w-full h-full bg-neutral-950 z-0"></div>
 
   <!-- Room Transition Black Curtain (Fades Old Room Immediately) -->
-  <div id="transition-curtain" class="fixed inset-0 bg-neutral-950 opacity-0 pointer-events-none z-40 transition-opacity duration-200"></div>
+  <div id="transition-curtain"
+    class="fixed inset-0 bg-neutral-950 opacity-0 pointer-events-none z-40 transition-opacity duration-200"></div>
 
   <!-- Cardboard VR Center Split Line -->
-  <div id="cardboard-divider" class="hidden fixed top-0 bottom-0 left-1/2 w-0.5 bg-neutral-800 z-40 pointer-events-none -translate-x-1/2"></div>
+  <div id="cardboard-divider"
+    class="hidden fixed top-0 bottom-0 left-1/2 w-0.5 bg-neutral-800 z-40 pointer-events-none -translate-x-1/2"></div>
 
   <!-- ==================== 2. NAVIGATION CROSSHAIR RETICLE ==================== -->
-  <div id="crosshair-reticle" class="fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
+  <div id="crosshair-reticle"
+    class="fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
     <div class="absolute w-2 h-[1.5px] -left-1.5 bg-white/70 rounded-full"></div>
     <div class="absolute w-2 h-[1.5px] -right-1.5 bg-white/70 rounded-full"></div>
     <div class="absolute h-2 w-[1.5px] -top-1.5 bg-white/70 rounded-full"></div>
     <div class="absolute h-2 w-[1.5px] -bottom-1.5 bg-white/70 rounded-full"></div>
-    <div id="reticle-dot" class="w-1.5 h-1.5 bg-rose-500 rounded-full shadow-[0_0_8px_#ef4444] transition-transform duration-150"></div>
+    <div id="reticle-dot"
+      class="w-1.5 h-1.5 bg-rose-500 rounded-full shadow-[0_0_8px_#ef4444] transition-transform duration-150"></div>
     <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
-      <path id="dwell-ring" class="text-rose-500 transition-all duration-75" stroke-dasharray="100" stroke-dashoffset="100" stroke-width="2.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+      <path id="dwell-ring" class="text-rose-500 transition-all duration-75" stroke-dasharray="100"
+        stroke-dashoffset="100" stroke-width="2.5" stroke-linecap="round" stroke="currentColor" fill="none"
+        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
     </svg>
   </div>
 
   <!-- Placement Instruction Banner (In Editor Mode) -->
-  <div id="placement-alert" class="hidden fixed top-20 left-1/2 -translate-x-1/2 glass-frosted px-4 py-2 rounded-full shadow-2xl z-30 flex items-center space-x-2.5 border border-rose-500/30 text-xs">
+  <div id="placement-alert"
+    class="hidden fixed top-20 left-1/2 -translate-x-1/2 glass-frosted px-4 py-2 rounded-full shadow-2xl z-30 flex items-center space-x-2.5 border border-rose-500/30 text-xs">
     <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-    <span id="placement-alert-text" class="font-medium text-white">Click on floor for Doorway or object for Item Dot</span>
+    <span id="placement-alert-text" class="font-medium text-white">Click on floor for Doorway or object for Item
+      Dot</span>
     <button onclick="cancelPlacement()" class="text-slate-400 hover:text-white underline ml-1.5">Cancel</button>
   </div>
 
   <!-- ==================== 3. TOP NAVIGATION BAR (RESPONSIVE & MINIMALIST) ==================== -->
-  <header id="main-header" class="fixed top-0 left-0 right-0 h-14 md:h-16 px-3 md:px-6 flex items-center justify-between z-20 pointer-events-none transition-all duration-300">
-    
+  <header id="main-header"
+    class="fixed top-0 left-0 right-0 h-14 md:h-16 px-3 md:px-6 flex items-center justify-between z-20 pointer-events-none transition-all duration-300">
+
     <!-- Left: Brand Logo & Property Switcher (Minimalist - No Tagline) -->
     <div class="flex items-center space-x-2 pointer-events-auto">
       <div class="flex items-center space-x-2 glass-frosted px-3 py-1.5 rounded-xl border border-white/10">
-        <div class="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs font-bold border border-rose-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+        <div
+          class="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs font-bold border border-rose-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
           <i class="fa-solid fa-vr-cardboard text-[11px]"></i>
         </div>
         <span class="font-display font-bold text-xs tracking-wider uppercase text-white">RAZEL 360</span>
       </div>
 
       <!-- Property Switcher Modal Button -->
-      <button onclick="openTourPickerModal()" class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
+      <button onclick="openTourPickerModal()"
+        class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
         <i class="fa-solid fa-building text-rose-400 text-[11px]"></i>
-        <span id="header-tour-name" class="font-display tracking-wide max-w-[100px] md:max-w-[180px] truncate text-white">Villa Lumina</span>
+        <span id="header-tour-name"
+          class="font-display tracking-wide max-w-[100px] md:max-w-[180px] truncate text-white">Villa Lumina</span>
         <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
       </button>
     </div>
@@ -135,81 +173,104 @@
       <div class="glass-frosted px-4 py-1.5 rounded-full flex items-center space-x-2 border border-white/10">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_#ef4444]"></span>
         <span class="text-[11px] font-medium text-slate-400" id="header-room-step">Room 1 of 6:</span>
-        <span class="text-xs font-bold text-white tracking-wide font-display" id="header-room-title">Villa Facade & Pool</span>
+        <span class="text-xs font-bold text-white tracking-wide font-display" id="header-room-title">Villa Facade &
+          Pool</span>
       </div>
     </div>
 
     <!-- Right: Consolidated Controls (Auto Demo, Studio, VR, Settings & UI Toggle) -->
     <div class="flex items-center space-x-1.5 md:space-x-2 pointer-events-auto">
-      
+
       <!-- Auto Demo Play Button -->
-      <button id="btn-auto-demo" onclick="toggleAutoDemo()" class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5" title="Play Automated Guided Tour">
+      <button id="btn-auto-demo" onclick="toggleAutoDemo()"
+        class="glass-button px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5"
+        title="Play Automated Guided Tour">
         <i class="fa-solid fa-play text-[10px] text-rose-400" id="demo-btn-icon"></i>
         <span class="hidden sm:inline" id="demo-btn-label">Auto Demo</span>
       </button>
 
       <!-- Studio Drawer Toggle -->
-      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()" class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()"
+        class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
         <i class="fa-solid fa-sliders text-[11px]"></i>
         <span class="hidden md:inline" id="editor-btn-label">Studio</span>
       </button>
 
       <!-- Cardboard VR Mode -->
-      <button id="btn-cardboard" onclick="toggleCardboardVR()" class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+      <button id="btn-cardboard" onclick="toggleCardboardVR()"
+        class="glass-button px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
         <i class="fa-solid fa-vr-cardboard text-[11px] text-rose-400"></i>
         <span class="hidden sm:inline" id="cardboard-btn-label">VR</span>
       </button>
 
       <!-- Settings Menu Icon (Consolidates Audio, Tilt, Visualizer Specs, etc.) -->
-      <button onclick="toggleSettingsModal()" class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center" title="Tour Settings">
+      <button onclick="toggleSettingsModal()"
+        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
+        title="Tour Settings">
         <i class="fa-solid fa-gear text-[11px] text-slate-300"></i>
       </button>
 
       <!-- UI Hide / Show Eye Toggle (Unobstructed View) -->
-      <button onclick="toggleUIVisibility()" class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center" title="Toggle Clean View">
+      <button onclick="toggleUIVisibility()"
+        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
+        title="Toggle Clean View">
         <i class="fa-solid fa-eye text-[11px] text-slate-300" id="ui-eye-icon"></i>
       </button>
 
       <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullscreen()" class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center" title="Toggle Fullscreen">
+      <button onclick="toggleFullscreen()"
+        class="glass-button p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center"
+        title="Toggle Fullscreen">
         <i class="fa-solid fa-expand text-[11px] text-slate-300"></i>
       </button>
     </div>
   </header>
 
   <!-- ==================== 4. BOTTOM STREET VIEW DOCK & CAROUSEL (RESPONSIVE & COMPACT) ==================== -->
-  <div id="main-bottom-dock" class="fixed bottom-3 md:bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-1.5 md:space-y-2 z-20 pointer-events-none px-2 md:px-4 transition-all duration-300">
-    
+  <div id="main-bottom-dock"
+    class="fixed bottom-3 md:bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-1.5 md:space-y-2 z-20 pointer-events-none px-2 md:px-4 transition-all duration-300">
+
     <!-- Collapsible Strip Container -->
     <div id="room-strip-wrapper" class="flex items-center space-x-1.5 pointer-events-auto transition-all duration-300">
-      
+
       <!-- Small Compact Room Pills Strip -->
-      <div id="room-strip" class="glass-frosted p-1 rounded-2xl flex items-center space-x-1 overflow-x-auto max-w-[calc(100vw-60px)] md:max-w-2xl shadow-2xl transition-all duration-300"></div>
+      <div id="room-strip"
+        class="glass-frosted p-1 rounded-2xl flex items-center space-x-1 overflow-x-auto max-w-[calc(100vw-60px)] md:max-w-2xl shadow-2xl transition-all duration-300">
+      </div>
 
       <!-- Collapse Toggle Button for Bottom Bar -->
-      <button onclick="toggleBottomStripCollapse()" class="glass-button w-7 h-7 rounded-xl flex items-center justify-center text-slate-300 shrink-0" title="Collapse / Expand Room Bar">
+      <button onclick="toggleBottomStripCollapse()"
+        class="glass-button w-7 h-7 rounded-xl flex items-center justify-center text-slate-300 shrink-0"
+        title="Collapse / Expand Room Bar">
         <i class="fa-solid fa-chevron-down text-[10px]" id="strip-collapse-icon"></i>
       </button>
     </div>
 
     <!-- Navigation Dock: Optical Zoom & Floor Rooms Modal -->
     <div class="pointer-events-auto flex items-center space-x-1.5 md:space-x-2">
-      
+
       <!-- Optical Zoom Controls -->
       <div class="glass-frosted px-1.5 md:px-2 py-1 rounded-xl flex items-center space-x-1 shadow-lg">
-        <button onclick="zoomStep(-1)" class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-xs" title="Zoom Out (-)">
+        <button onclick="zoomStep(-1)"
+          class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-xs"
+          title="Zoom Out (-)">
           <i class="fa-solid fa-minus text-[10px]"></i>
         </button>
-        <button onclick="resetZoom()" class="px-1.5 md:px-2 h-6 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-[10px] md:text-[11px] font-mono font-bold" id="zoom-level-text" title="Reset Zoom">
+        <button onclick="resetZoom()"
+          class="px-1.5 md:px-2 h-6 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-[10px] md:text-[11px] font-mono font-bold"
+          id="zoom-level-text" title="Reset Zoom">
           100%
         </button>
-        <button onclick="zoomStep(1)" class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-xs" title="Zoom In (+)">
+        <button onclick="zoomStep(1)"
+          class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-white flex items-center justify-center transition text-xs"
+          title="Zoom In (+)">
           <i class="fa-solid fa-plus text-[10px]"></i>
         </button>
       </div>
 
       <!-- Quick Room Gallery Button -->
-      <button onclick="toggleSceneGalleryModal()" class="glass-button px-2.5 md:px-3 py-1 md:py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
+      <button onclick="toggleSceneGalleryModal()"
+        class="glass-button px-2.5 md:px-3 py-1 md:py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
         <i class="fa-solid fa-layer-group text-rose-400 text-xs"></i>
         <span>Rooms (<span id="dock-room-count">6</span>)</span>
       </button>
@@ -217,7 +278,8 @@
   </div>
 
   <!-- ==================== 5. SETTINGS POPUP MODAL ==================== -->
-  <div id="modal-settings" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+  <div id="modal-settings"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-sm rounded-3xl p-5 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div class="flex items-center space-x-2">
@@ -230,7 +292,7 @@
       </div>
 
       <div class="space-y-3 text-xs">
-        
+
         <!-- Sound FX Toggle -->
         <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
           <div class="flex items-center space-x-2.5">
@@ -240,7 +302,8 @@
               <p class="text-[10px] text-slate-400">Doorstep & callout sound feedback</p>
             </div>
           </div>
-          <button id="btn-toggle-audio-switch" onclick="toggleAudio()" class="px-3 py-1 rounded-lg text-xs font-bold transition glass-active text-white">
+          <button id="btn-toggle-audio-switch" onclick="toggleAudio()"
+            class="px-3 py-1 rounded-lg text-xs font-bold transition glass-active text-white">
             ON
           </button>
         </div>
@@ -254,7 +317,8 @@
               <p class="text-[10px] text-slate-400">Look around by moving tablet / phone</p>
             </div>
           </div>
-          <button id="btn-settings-gyro" onclick="toggleGyroscope()" class="px-3 py-1 rounded-lg text-xs font-bold transition glass-button text-slate-300">
+          <button id="btn-settings-gyro" onclick="toggleGyroscope()"
+            class="px-3 py-1 rounded-lg text-xs font-bold transition glass-button text-slate-300">
             OFF
           </button>
         </div>
@@ -268,20 +332,23 @@
               <p class="text-[10px] text-slate-400">Center crosshair & gaze target</p>
             </div>
           </div>
-          <button id="btn-toggle-reticle" onclick="toggleReticle()" class="px-3 py-1 rounded-lg text-xs font-bold transition glass-active text-white">
+          <button id="btn-toggle-reticle" onclick="toggleReticle()"
+            class="px-3 py-1 rounded-lg text-xs font-bold transition glass-active text-white">
             ON
           </button>
         </div>
 
         <!-- 3D Render Specs Handoff Button -->
-        <button onclick="toggleSettingsModal(); openDesignGuidelinesModal();" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs flex items-center justify-center space-x-2 transition">
+        <button onclick="toggleSettingsModal(); openDesignGuidelinesModal();"
+          class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs flex items-center justify-center space-x-2 transition">
           <i class="fa-solid fa-camera-rotate text-rose-400"></i>
           <span>360° Specs for 3D Visualizers</span>
         </button>
       </div>
 
       <div class="pt-2 text-right">
-        <button onclick="toggleSettingsModal()" class="px-4 py-1.5 glass-button text-xs font-bold rounded-xl text-white">
+        <button onclick="toggleSettingsModal()"
+          class="px-4 py-1.5 glass-button text-xs font-bold rounded-xl text-white">
           Done
         </button>
       </div>
@@ -289,34 +356,39 @@
   </div>
 
   <!-- ==================== 6. SLIDE-OUT STUDIO DRAWER (EDITOR) ==================== -->
-  <aside id="editor-drawer" class="fixed top-14 md:top-16 bottom-3 md:bottom-4 left-3 md:left-4 w-96 max-w-[calc(100vw-24px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
-    
+  <aside id="editor-drawer"
+    class="fixed top-14 md:top-16 bottom-3 md:bottom-4 left-3 md:left-4 w-96 max-w-[calc(100vw-24px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
+
     <!-- Drawer Header -->
     <div class="p-3.5 md:p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
       <div class="flex items-center space-x-2.5">
-        <div class="w-7 h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-xs text-rose-400 border border-rose-500/30">
-          <i class="fa-solid fa-sliders"></i>
+        <div
+          class="w-7 h-7 rounded-lg bg-rose-500/20 flex items-center justify-center text-xs text-rose-400 border border-rose-500/30">
+          <i class="fa-solid fa-vr-cardboard text-xl text-white"></i>
         </div>
         <div>
-          <h2 class="text-xs md:text-sm font-bold font-display text-white">Tour Studio Pro</h2>
+
+          <h2 class="text-xs md:text-sm font-bold font-display text-white">Razel 360 </h2>
           <p class="text-[9px] md:text-[10px] text-slate-400 font-medium">Powered by Razel Tech</p>
         </div>
       </div>
-      <button onclick="toggleEditorDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+      <button onclick="toggleEditorDrawer()"
+        class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
     </div>
 
     <!-- Drawer Body -->
     <div class="flex-1 overflow-y-auto p-3.5 md:p-4 space-y-4">
-      
+
       <!-- Upload 360 Panorama Renders -->
       <div class="p-3 rounded-xl border border-dashed border-white/20 bg-white/5 text-center">
         <label class="cursor-pointer block">
           <i class="fa-solid fa-cloud-arrow-up text-rose-400 text-lg mb-1"></i>
           <p class="text-xs font-bold text-white">Upload 360° Panorama Renders</p>
           <p class="text-[10px] text-slate-400 mt-0.5">Equirectangular 2:1 ratio (Auto-seamless blend)</p>
-          <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageBatch(event)">
+          <input type="file" id="image-upload" accept="image/*" multiple class="hidden"
+            onchange="handleImageBatch(event)">
         </label>
       </div>
 
@@ -324,7 +396,8 @@
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rooms in Tour</h3>
-          <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">6 Rooms</span>
+          <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">6
+            Rooms</span>
         </div>
         <div id="studio-scene-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
       </div>
@@ -333,16 +406,19 @@
       <div class="p-3 rounded-xl bg-black/40 border border-white/10 space-y-2.5">
         <div class="flex items-center justify-between">
           <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Add Hotspots</h3>
-          <span id="hotspot-badge-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">0 active</span>
+          <span id="hotspot-badge-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white font-mono">0
+            active</span>
         </div>
 
         <!-- Hotspot Type Switcher Tabs -->
         <div class="grid grid-cols-2 gap-1.5 p-1 bg-black/50 rounded-xl border border-white/5">
-          <button id="tab-portal-btn" onclick="switchHotspotTab('portal')" class="py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow">
+          <button id="tab-portal-btn" onclick="switchHotspotTab('portal')"
+            class="py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow">
             <i class="fa-solid fa-door-open text-[11px] text-rose-400"></i>
             <span>Doorway</span>
           </button>
-          <button id="tab-info-btn" onclick="switchHotspotTab('info')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5">
+          <button id="tab-info-btn" onclick="switchHotspotTab('info')"
+            class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5">
             <i class="fa-solid fa-circle-dot text-[11px] text-rose-400"></i>
             <span>Item Dot</span>
           </button>
@@ -351,8 +427,10 @@
         <!-- Doorway Portal Settings -->
         <div id="tab-portal-panel" class="space-y-2">
           <p class="text-[11px] text-slate-400">Connect doorway to room:</p>
-          <select id="portal-target-select" class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500"></select>
-          <button id="btn-arm-portal" onclick="armPlacement('portal')" class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border border-rose-500/30">
+          <select id="portal-target-select"
+            class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500"></select>
+          <button id="btn-arm-portal" onclick="armPlacement('portal')"
+            class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border border-rose-500/30">
             <i class="fa-solid fa-location-crosshairs text-rose-400"></i>
             <span id="portal-btn-label">Place Doorway Portal</span>
           </button>
@@ -362,23 +440,29 @@
         <div id="tab-info-panel" class="space-y-2 hidden">
           <div>
             <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Item Title</label>
-            <input type="text" id="info-title-input" placeholder="e.g. Minotti Italian Sectional" class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
+            <input type="text" id="info-title-input" placeholder="e.g. Minotti Italian Sectional"
+              class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Category Tag</label>
-              <input type="text" id="info-tag-input" placeholder="e.g. FURNITURE" class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
+              <input type="text" id="info-tag-input" placeholder="e.g. FURNITURE"
+                class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
             </div>
             <div>
               <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Price Tag</label>
-              <input type="text" id="info-price-input" placeholder="e.g. $18,400" class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
+              <input type="text" id="info-price-input" placeholder="e.g. $18,400"
+                class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500">
             </div>
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Description / Specs</label>
-            <textarea id="info-desc-input" rows="2" placeholder="e.g. Custom Bouclé fabric, dark bronze trim, modular deep seating" class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500 resize-none"></textarea>
+            <textarea id="info-desc-input" rows="2"
+              placeholder="e.g. Custom Bouclé fabric, dark bronze trim, modular deep seating"
+              class="w-full bg-white/5 border border-white/15 text-white text-xs rounded-xl p-2 outline-none focus:border-rose-500 resize-none"></textarea>
           </div>
-          <button id="btn-arm-info" onclick="armPlacement('info')" class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 border border-rose-500/30">
+          <button id="btn-arm-info" onclick="armPlacement('info')"
+            class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 border border-rose-500/30">
             <i class="fa-solid fa-circle-dot text-rose-400"></i>
             <span id="info-btn-label">Place Item Beacon Dot</span>
           </button>
@@ -394,10 +478,12 @@
 
     <!-- Drawer Footer Actions -->
     <div class="p-3 border-t border-white/10 bg-black/40 flex items-center justify-between space-x-2">
-      <button onclick="exportCurrentTourJSON()" class="flex-1 py-1.5 glass-button text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1">
+      <button onclick="exportCurrentTourJSON()"
+        class="flex-1 py-1.5 glass-button text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1">
         <i class="fa-solid fa-download text-[10px] text-rose-400"></i> <span>Export Tour</span>
       </button>
-      <label class="flex-1 py-1.5 glass-button text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1 cursor-pointer">
+      <label
+        class="flex-1 py-1.5 glass-button text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1 cursor-pointer">
         <i class="fa-solid fa-upload text-[10px] text-rose-400"></i> <span>Import Tour</span>
         <input type="file" id="import-tour-file" accept=".json" class="hidden" onchange="importTourJSON(event)">
       </label>
@@ -405,7 +491,8 @@
   </aside>
 
   <!-- ==================== 7. PROPERTY TOUR SELECTOR MODAL ==================== -->
-  <div id="modal-tour-picker" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+  <div id="modal-tour-picker"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
@@ -420,11 +507,13 @@
       <div id="modal-tour-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1"></div>
 
       <div class="pt-2 flex items-center justify-between">
-        <button onclick="createNewTourPrompt()" class="px-4 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center space-x-2">
+        <button onclick="createNewTourPrompt()"
+          class="px-4 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center space-x-2">
           <i class="fa-solid fa-plus text-rose-400"></i>
           <span>Create New Property Tour</span>
         </button>
-        <button onclick="closeTourPickerModal()" class="px-4 py-2 bg-white/10 hover:bg-white/15 text-slate-300 rounded-xl text-xs font-semibold">
+        <button onclick="closeTourPickerModal()"
+          class="px-4 py-2 bg-white/10 hover:bg-white/15 text-slate-300 rounded-xl text-xs font-semibold">
           Close
         </button>
       </div>
@@ -432,11 +521,13 @@
   </div>
 
   <!-- ==================== 8. DESIGNER GUIDELINES MODAL ==================== -->
-  <div id="modal-designer-guidelines" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+  <div id="modal-designer-guidelines"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-2xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
+          <div
+            class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
             <i class="fa-solid fa-camera-rotate"></i>
           </div>
           <div>
@@ -455,7 +546,8 @@
             <i class="fa-solid fa-ruler-combined text-rose-400"></i>
             <span>1. Aspect Ratio & Dimensions (Strict 2:1)</span>
           </h4>
-          <p>Renders must be output with a <strong>strict 2:1 aspect ratio</strong> using an <strong>Equirectangular 360° Spherical Camera</strong>. Recommended resolutions:</p>
+          <p>Renders must be output with a <strong>strict 2:1 aspect ratio</strong> using an <strong>Equirectangular
+              360° Spherical Camera</strong>. Recommended resolutions:</p>
           <ul class="list-disc list-inside mt-1 space-y-0.5 text-slate-400">
             <li><strong>Production Standard:</strong> 4096 × 2048 px (Sharp, fast mobile loading)</li>
             <li><strong>Ultra 8K Luxury:</strong> 6144 × 3072 px or 8192 × 4096 px</li>
@@ -467,7 +559,9 @@
             <i class="fa-solid fa-person-walking text-rose-400"></i>
             <span>2. Camera Height & Level Horizon</span>
           </h4>
-          <p>Camera height must strictly mimic natural human standing eye-level: <strong>1.55m to 1.65m (5.1 – 5.4 ft)</strong> above the finished floor level. Keep camera Pitch and Roll perfectly at <strong>0 degrees</strong> to prevent dizzying perspective tilts.</p>
+          <p>Camera height must strictly mimic natural human standing eye-level: <strong>1.55m to 1.65m (5.1 – 5.4
+              ft)</strong> above the finished floor level. Keep camera Pitch and Roll perfectly at <strong>0
+              degrees</strong> to prevent dizzying perspective tilts.</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
@@ -475,12 +569,15 @@
             <i class="fa-solid fa-sliders text-rose-400"></i>
             <span>3. Color Space & Lighting Continuity</span>
           </h4>
-          <p>Export in <strong>sRGB color profile</strong> (PNG or high-quality JPEG 95%). Ensure window lighting and exterior time-of-day match across adjacent rooms (e.g. living room, kitchen, and balcony share identical golden hour sky illumination).</p>
+          <p>Export in <strong>sRGB color profile</strong> (PNG or high-quality JPEG 95%). Ensure window lighting and
+            exterior time-of-day match across adjacent rooms (e.g. living room, kitchen, and balcony share identical
+            golden hour sky illumination).</p>
         </div>
       </div>
 
       <div class="pt-2 text-right">
-        <button onclick="closeDesignGuidelinesModal()" class="px-5 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs">
+        <button onclick="closeDesignGuidelinesModal()"
+          class="px-5 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs">
           Dismiss
         </button>
       </div>
@@ -488,7 +585,8 @@
   </div>
 
   <!-- ==================== 9. ROOM GALLERY MODAL ==================== -->
-  <div id="modal-scene-gallery" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+  <div id="modal-scene-gallery"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
     <div class="glass-frosted w-full max-w-3xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
@@ -519,23 +617,23 @@
           imageSrc: './assets/demo/exterior.jpg',
           hotspots: [
             { id: 'hs_ext_to_living', type: 'portal', targetSceneId: 'scene_living', x: 160, y: -45, z: -360 },
-            { 
-              id: 'callout_pool', 
-              type: 'info', 
-              title: 'Negative-Edge Reflection Pool', 
+            {
+              id: 'callout_pool',
+              type: 'info',
+              title: 'Negative-Edge Reflection Pool',
               tag: 'EXTERIOR ARCHITECTURE',
-              price: '$280,000', 
-              description: 'Architectural heated saltwater pool with honed basalt coping and flush concealed skimmers.', 
-              x: 80, y: -130, z: -350 
+              price: '$280,000',
+              description: 'Architectural heated saltwater pool with honed basalt coping and flush concealed skimmers.',
+              x: 80, y: -130, z: -350
             },
-            { 
-              id: 'callout_facade', 
-              type: 'info', 
-              title: 'Cedar Cladding & Post-Tensioned Concrete', 
+            {
+              id: 'callout_facade',
+              type: 'info',
+              title: 'Cedar Cladding & Post-Tensioned Concrete',
               tag: 'FACADE ARCHITECTURE',
-              price: 'Bespoke', 
-              description: 'Board-formed architectural concrete paired with Japanese Shou Sugi Ban charred cedar finish.', 
-              x: -240, y: 70, z: -310 
+              price: 'Bespoke',
+              description: 'Board-formed architectural concrete paired with Japanese Shou Sugi Ban charred cedar finish.',
+              x: -240, y: 70, z: -310
             }
           ]
         },
@@ -678,9 +776,238 @@
       ]
     };
 
+    const DEMO_PALM_ROYALE = {
+      id: 'tour_palm_royale',
+      title: 'The Palm Royale | French Limestone Chateau',
+      location: 'Cap d’Antibes & Beverly Park',
+      price: '$28,500,000',
+      heroImage: './assets/demo2/2026-09-25_16-48-08_qwen_00079_.png',
+      scenes: [
+        {
+          id: 'scene_royale_exterior',
+          name: 'Royal Entrance & Facade',
+          imageSrc: './assets/demo2/2026-09-25_16-48-08_qwen_00079_.png',
+          hotspots: [
+            { id: 'hs_pr_ext_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: 0, y: -20, z: -390 },
+            { id: 'hs_pr_ext_to_pool', type: 'portal', targetSceneId: 'scene_royale_pool', x: 340, y: -40, z: 180 },
+            {
+              id: 'callout_pr_limestone',
+              type: 'info',
+              title: 'Hand-Cut French Burgundy Limestone',
+              tag: 'FACADE ARCHITECTURE',
+              price: 'Bespoke Milled',
+              description: 'Solid hand-carved Roman arch portico with honed Burgundy limestone ashlar masonry.',
+              x: -180, y: 80, z: -340
+            },
+            {
+              id: 'callout_pr_garden',
+              type: 'info',
+              title: 'Manicured Mediterranean Parterre Garden',
+              tag: 'LANDSCAPE ARCHITECTURE',
+              price: '$450,000',
+              description: 'Formal French parterre with century-old date palms, sculpted boxwood topiaries, and ambient up-lighting.',
+              x: 280, y: -60, z: -270
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_foyer',
+          name: 'Grand Reception Foyer',
+          imageSrc: './assets/demo2/2026-09-25_16-58-24_qwen_00080_.png',
+          hotspots: [
+            { id: 'hs_pr_foyer_to_ext', type: 'portal', targetSceneId: 'scene_royale_exterior', x: 20, y: -30, z: 390 },
+            { id: 'hs_pr_foyer_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: 350, y: -30, z: -170 },
+            { id: 'hs_pr_foyer_to_dining', type: 'portal', targetSceneId: 'scene_royale_dining', x: -350, y: -30, z: -160 },
+            {
+              id: 'callout_pr_glass_art',
+              type: 'info',
+              title: 'Venetian Murano Glass Chandelier',
+              tag: 'CUSTOM ART FIXTURE',
+              price: '$65,000',
+              description: 'Bespoke hand-blown organic glass sculpture reflecting warm ambient illumination across coffered ceiling.',
+              x: -10, y: 190, z: -330
+            },
+            {
+              id: 'callout_pr_marble_floor',
+              type: 'info',
+              title: 'Crema Marfil Bookmatched Slabs',
+              tag: 'SURFACE FINISHES',
+              price: '$88,000',
+              description: 'Seamless radiant-heated Spanish Crema Marfil marble slabs with satin honed finish.',
+              x: 40, y: -160, z: -350
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_living',
+          name: 'Double-Height Great Salon',
+          imageSrc: './assets/demo2/2026-09-25_17-10-53_qwen_00081_.png',
+          hotspots: [
+            { id: 'hs_pr_liv_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: -360, y: -30, z: 150 },
+            { id: 'hs_pr_liv_to_kitchen', type: 'portal', targetSceneId: 'scene_royale_kitchen', x: 330, y: -35, z: 200 },
+            { id: 'hs_pr_liv_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: -30, y: -40, z: -390 },
+            {
+              id: 'callout_pr_sofa',
+              type: 'info',
+              title: 'Custom Curved Bouclé Sectional',
+              tag: 'BESPOKE FURNITURE',
+              price: '$42,000',
+              description: 'Organic curved double-sided lounge seating upholstered in French bouclé wool with integrated bronze trays.',
+              x: -140, y: -100, z: -340
+            },
+            {
+              id: 'callout_pr_glass_wall',
+              type: 'info',
+              title: 'Motorized Minimalist Glass Curtains',
+              tag: 'ARCHITECTURAL GLAZING',
+              price: '$180,000',
+              description: '24ft floor-to-ceiling ultra-clear Schuco motorized sliding glass facade opening seamlessly to gardens.',
+              x: -320, y: 60, z: -220
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_dining',
+          name: 'Formal Banquet Dining Salon',
+          imageSrc: './assets/demo2/2026-09-25_17-21-58_qwen_00085_.png',
+          hotspots: [
+            { id: 'hs_pr_din_to_foyer', type: 'portal', targetSceneId: 'scene_royale_foyer', x: -330, y: -30, z: 210 },
+            { id: 'hs_pr_din_to_kitchen', type: 'portal', targetSceneId: 'scene_royale_kitchen', x: 350, y: -30, z: 170 },
+            {
+              id: 'callout_pr_dining_table',
+              type: 'info',
+              title: 'Solid American Walnut Banquet Table',
+              tag: 'CUSTOM MILLWORK',
+              price: '$32,500',
+              description: 'Single-slab live-edge American black walnut seating 14 guests, paired with customized leather armchairs.',
+              x: 40, y: -90, z: -380
+            },
+            {
+              id: 'callout_pr_chandelier',
+              type: 'info',
+              title: 'Fluted Brass Tubular Pendant Cluster',
+              tag: 'LIGHTING DESIGN',
+              price: '$28,000',
+              description: 'Multi-tiered brushed antique brass architectural fixture with warm 2700K dimmable LED tubes.',
+              x: -220, y: 130, z: -300
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_kitchen',
+          name: 'Chef Sculptural Kitchen',
+          imageSrc: './assets/demo2/2026-09-25_17-14-09_qwen_00082_.png',
+          hotspots: [
+            { id: 'hs_pr_kit_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: -350, y: -30, z: -170 },
+            { id: 'hs_pr_kit_to_dining', type: 'portal', targetSceneId: 'scene_royale_dining', x: -330, y: -30, z: 210 },
+            { id: 'hs_pr_kit_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: 340, y: -35, z: 180 },
+            {
+              id: 'callout_pr_curved_island',
+              type: 'info',
+              title: 'Monolithic Calacatta Gold Wave Island',
+              tag: 'CHEF KITCHEN',
+              price: '$56,000',
+              description: 'Sculptural curved marble island with integrated concealed induction cooktops and prep sink trough.',
+              x: 10, y: -90, z: -380
+            },
+            {
+              id: 'callout_pr_appliances',
+              type: 'info',
+              title: 'Gaggenau 400 Series Appliance Suite',
+              tag: 'LUXURY APPLIANCE',
+              price: '$48,000',
+              description: 'Flush-integrated combi-steam ovens, warming drawers, vacuum sealer, and full-height refrigerated columns.',
+              x: 320, y: 10, z: -230
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_bedroom',
+          name: 'Primary Master Suite Retreat',
+          imageSrc: './assets/demo2/2026-09-25_17-16-47_qwen_00083_.png',
+          hotspots: [
+            { id: 'hs_pr_bed_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: -350, y: -30, z: -180 },
+            { id: 'hs_pr_bed_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: 340, y: -30, z: 180 },
+            {
+              id: 'callout_pr_round_bed',
+              type: 'info',
+              title: 'Custom Elliptical Bouclé Bedstead',
+              tag: 'BEDROOM SUITE',
+              price: '$26,000',
+              description: 'Tailored curved platform upholstered in French cashmere bouclé with curved fluted oak headwall alcove.',
+              x: -10, y: -80, z: -380
+            },
+            {
+              id: 'callout_pr_alcove',
+              type: 'info',
+              title: 'Architectural Fluted Oak Niche',
+              tag: 'CUSTOM MILLWORK',
+              price: 'Bespoke',
+              description: 'Curved wood veneer wall panelling with integrated flush nightstands and ambient niche backlighting.',
+              x: 0, y: 80, z: -380
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_terrace',
+          name: 'Sunset Sky Terrace & Pavilion',
+          imageSrc: './assets/demo2/2026-09-25_17-19-32_qwen_00084_.png',
+          hotspots: [
+            { id: 'hs_pr_ter_to_living', type: 'portal', targetSceneId: 'scene_royale_living', x: 260, y: -30, z: -290 },
+            { id: 'hs_pr_ter_to_pool', type: 'portal', targetSceneId: 'scene_royale_pool', x: -330, y: -45, z: 200 },
+            {
+              id: 'callout_pr_terrace_soffit',
+              type: 'info',
+              title: 'Cantilevered Teak Slat Soffit',
+              tag: 'EXTERIOR ARCHITECTURE',
+              price: '$92,000',
+              description: 'Compound curve marine-grade teak ceiling canopy with flush recessed waterproof LED downlights.',
+              x: 20, y: 150, z: -350
+            },
+            {
+              id: 'callout_pr_lounge',
+              type: 'info',
+              title: 'Dedon MBRACE Outdoor Lounge Group',
+              tag: 'TERRACE LIVING',
+              price: '$21,400',
+              description: 'Fiber-woven modular outdoor sectional with quick-dry reticulated foam cushions and travertine coffee table.',
+              x: -90, y: -90, z: -360
+            }
+          ]
+        },
+        {
+          id: 'scene_royale_pool',
+          name: 'Resort Oasis Pool & Loggia',
+          imageSrc: './assets/demo2/2026-09-25_17-24-21_qwen_00086_.png',
+          hotspots: [
+            { id: 'hs_pr_pool_to_exterior', type: 'portal', targetSceneId: 'scene_royale_exterior', x: -350, y: -30, z: -170 },
+            { id: 'hs_pr_pool_to_terrace', type: 'portal', targetSceneId: 'scene_royale_terrace', x: 330, y: -30, z: 200 },
+            {
+              id: 'callout_pr_pool',
+              type: 'info',
+              title: 'Sukabumi Quartzite Heated Pool',
+              tag: 'RESORT AMENITIES',
+              price: '$380,000',
+              description: 'Natural Balinese green Sukabumi stone pool with zero-edge perimeter gutter and shallow Baja sun shelf.',
+              x: 80, y: -110, z: -360
+            },
+            {
+              id: 'callout_pr_loggia',
+              type: 'info',
+              title: 'Bi-Folding Glass Loggia Cabana',
+              tag: 'OUTDOOR ARCHITECTURE',
+              price: 'Bespoke',
+              description: 'Curved second-story cantilevered terrace with pocketing frameless glass doors overlooking resort gardens.',
+              x: -240, y: 70, z: -300
+            }
+          ]
+        }
+      ]
+    };
+
     // ---------- GLOBAL STATE ----------
     let appState = {
-      tours: [DEMO_VILLA_LUMINA],
+      tours: [DEMO_VILLA_LUMINA, DEMO_PALM_ROYALE],
       activeTourId: 'tour_villa_lumina',
       activeSceneId: 'scene_exterior'
     };
@@ -759,7 +1086,7 @@
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.12);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function playWhooshSound() {
@@ -782,7 +1109,7 @@
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.22);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function toggleAudio() {
@@ -818,20 +1145,36 @@
           const w = canvas.width;
           const h = canvas.height;
 
-          for (let y = 0; y < h; y++) {
-            for (let i = 0; i < blendWidth; i++) {
-              const leftIdx = (y * w + i) * 4;
-              const rightIdx = (y * w + (w - 1 - i)) * 4;
-              const weight = (i + 1) / (blendWidth * 2);
+          // Measure average color variance between edge columns (x=0 vs x=w-1)
+          let seamDiff = 0;
+          const step = Math.max(1, Math.floor(h / 32));
+          let samples = 0;
+          for (let y = 0; y < h; y += step) {
+            const l = (y * w) * 4;
+            const r = (y * w + (w - 1)) * 4;
+            seamDiff += Math.abs(d[l] - d[r]) + Math.abs(d[l+1] - d[r+1]) + Math.abs(d[l+2] - d[r+2]);
+            samples += 3;
+          }
+          const avgDiff = seamDiff / samples;
 
-              for (let c = 0; c < 3; c++) {
-                const blended = Math.round(d[leftIdx + c] * (1 - weight) + d[rightIdx + c] * weight);
-                d[leftIdx + c] = blended;
-                d[rightIdx + c] = blended;
+          // Only apply feathering if the edges don't match (e.g. AI-generated renders).
+          // If already mathematically seamless from 3D studio renders (avgDiff <= 1.5), 100% original pixels are untouched!
+          if (avgDiff > 1.5) {
+            for (let y = 0; y < h; y++) {
+              for (let i = 0; i < blendWidth; i++) {
+                const leftIdx = (y * w + i) * 4;
+                const rightIdx = (y * w + (w - 1 - i)) * 4;
+                const weight = (i + 1) / (blendWidth * 2);
+
+                for (let c = 0; c < 3; c++) {
+                  const blended = Math.round(d[leftIdx + c] * (1 - weight) + d[rightIdx + c] * weight);
+                  d[leftIdx + c] = blended;
+                  d[rightIdx + c] = blended;
+                }
               }
             }
+            ctx.putImageData(imgData, 0, 0);
           }
-          ctx.putImageData(imgData, 0, 0);
         } catch (e) {
           // If cross-origin restrictions apply, fallback to raw image
         }
@@ -876,7 +1219,7 @@
     }
 
     // ---------- INITIALIZATION ----------
-    window.onload = function() {
+    window.onload = function () {
       initThreeEngine();
       loadAppStorage();
       bindWindowResize();
@@ -905,7 +1248,7 @@
       // High-tessellation Sphere with scale(-1, 1, 1) for inverted skyview
       const sphereGeo = new THREE.SphereGeometry(500, 96, 64);
       sphereGeo.scale(-1, 1, 1);
-      
+
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0x050811, toneMapped: false });
       sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
       scene.add(sphereMesh);
@@ -1489,11 +1832,11 @@
 
         // Stage 2 (0.4 to 1.0): Card pops open at tip of arrow
         const cardProgress = Math.max(0.0, (t - 0.4) / 0.6);
-        
+
         // Zoom Compensation: Keeps card comfortably large & readable at any FOV zoom level
         const zoomRatio = (camera.fov / 75);
         const cardScale = THREE.MathUtils.lerp(0.1, 1.0, cardProgress) * Math.max(0.9, zoomRatio);
-        
+
         card.scale.set(cardScale, cardScale, cardScale);
         card.material.opacity = cardProgress;
 
@@ -1728,7 +2071,7 @@
         bottomDock.classList.add('hidden');
         reticle.classList.remove('hidden');
 
-        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { });
       } else {
         divider.classList.add('hidden');
         btn.classList.remove('glass-active', 'text-white');
@@ -1737,16 +2080,16 @@
         header.classList.remove('hidden');
         bottomDock.classList.remove('hidden');
 
-        if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => { });
       }
       onWindowResize();
     }
 
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        document.documentElement.requestFullscreen().catch(() => { });
       } else {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
     }
 
@@ -2168,6 +2511,10 @@
         try {
           const parsed = JSON.parse(raw);
           if (parsed && parsed.tours && parsed.tours.length > 0) {
+            // Ensure both built-in showcases (Villa Lumina & Palm Royale) are accessible
+            if (!parsed.tours.some(t => t.id === DEMO_PALM_ROYALE.id)) {
+              parsed.tours.push(DEMO_PALM_ROYALE);
+            }
             appState = parsed;
           }
         } catch (e) { console.error(e); }
@@ -2283,4 +2630,5 @@
     }
   </script>
 </body>
+
 </html>
