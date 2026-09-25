@@ -1,7 +1,7 @@
 /**
- * Headless Automated Test Suite for Lumina 360 Virtual Tour Engine
+ * Headless Automated Test Suite for Razel 360 Virtual Tour Engine
  * Tests HTML markup, Three.js script syntax, multi-tour data integrity,
- * JSON export/import workflows, and demo asset resolution.
+ * JSON export/import workflows, audio synth, and mobile responsiveness.
  */
 
 const fs = require('fs');
@@ -24,23 +24,32 @@ function assert(condition, message) {
 }
 
 console.log('\n======================================================');
-console.log('  LUMINA 360 HEADLESS TEST SUITE');
+console.log('  RAZEL 360 HEADLESS TEST SUITE');
 console.log('======================================================\n');
 
-// 1. Test HTML File & Structure
-console.log('\x1b[36m[1/5] Validating HTML & Resource Links...\x1b[0m');
+// 1. Test HTML File & Branding Structure
+console.log('\x1b[36m[1/6] Validating HTML, Favicon & Razel Branding...\x1b[0m');
 const indexPath = path.join(ROOT_DIR, 'index.html');
 assert(fs.existsSync(indexPath), 'index.html exists in root directory');
 
 const htmlContent = fs.readFileSync(indexPath, 'utf8');
+assert(htmlContent.includes('Razel 360'), 'Title and brand name is set to Razel 360');
+assert(htmlContent.includes('Powered by Razel Tech'), 'Tour Studio includes "Powered by Razel Tech"');
+assert(htmlContent.includes('rel="icon" type="image/svg+xml"'), 'Inline SVG VR Cardboard headset favicon is present');
 assert(htmlContent.includes('three.min.js'), 'Three.js library is included');
-assert(htmlContent.includes('Plus+Jakarta+Sans'), 'Plus Jakarta Sans typography is included');
 assert(htmlContent.includes('id="crosshair-reticle"'), 'Permanent navigation crosshair element exists');
 assert(htmlContent.includes('id="canvas-container"'), 'Canvas container element exists');
-assert(htmlContent.includes('id="editor-drawer"'), 'Tour Studio Drawer element exists');
+assert(htmlContent.includes('id="btn-auto-demo"'), 'Automated Guided Demo button exists');
 
-// 2. Extract & Validate Embedded JavaScript
-console.log('\n\x1b[36m[2/5] Validating JavaScript Syntax & Execution...\x1b[0m');
+// 2. Mobile Responsiveness Checks
+console.log('\n\x1b[36m[2/6] Validating Mobile Responsiveness Meta & CSS...\x1b[0m');
+assert(htmlContent.includes('viewport-fit=cover'), 'Viewport includes viewport-fit=cover for notched mobile screens');
+assert(htmlContent.includes('md:h-16'), 'Header uses responsive height classes for mobile vs desktop');
+assert(htmlContent.includes('max-w-[calc(100vw-24px)]'), 'Studio drawer constrained cleanly for mobile viewports');
+assert(htmlContent.includes('overflow-x-auto'), 'Room thumbnail strip supports horizontal touch swipe');
+
+// 3. Extract & Validate Embedded JavaScript
+console.log('\n\x1b[36m[3/6] Validating JavaScript Engine & Audio Synthesizer...\x1b[0m');
 const scriptMatches = htmlContent.match(/<script>([\s\S]*?)<\/script>/);
 assert(!!scriptMatches && scriptMatches[1].length > 0, 'Embedded script block found in index.html');
 
@@ -53,9 +62,14 @@ try {
   console.error('Syntax Error:', e.message);
 }
 assert(syntaxOk, 'JavaScript syntax parses cleanly without errors');
+assert(scriptCode.includes('playPopSound'), 'Web Audio API pop chime synthesizer is implemented');
+assert(scriptCode.includes('playWhooshSound'), 'Web Audio API doorway transition whoosh synthesizer is implemented');
+assert(scriptCode.includes('toggleAutoDemo'), 'Automated guided walkthrough demo engine is implemented');
+assert(scriptCode.includes('create3DPortalDoorstepMesh'), 'Google Street View style floor doorstep ring disc is implemented');
+assert(scriptCode.includes('create3DCalloutMesh'), 'Small dot beacon with rising arrow stem callout is implemented');
 
-// 3. Validate Demo Tour Schema & Hotspots
-console.log('\n\x1b[36m[3/5] Validating Multi-Tour Data Schema & Demo Assets...\x1b[0m');
+// 4. Validate Demo Tour Schema & Hotspots
+console.log('\n\x1b[36m[4/6] Validating Multi-Tour Data Schema & Demo Assets...\x1b[0m');
 const tourMatch = scriptCode.match(/const DEMO_VILLA_LUMINA = (\{[\s\S]*?\n    \};)/);
 assert(!!tourMatch, 'DEMO_VILLA_LUMINA schema defined');
 
@@ -83,7 +97,6 @@ requiredScenes.forEach(sceneId => {
   if (scene) {
     assert(scene.hotspots && scene.hotspots.length > 0, `Scene '${sceneId}' has active hotspots (${scene.hotspots ? scene.hotspots.length : 0})`);
     
-    // Verify relative asset path on disk
     const normalizedRelPath = scene.imageSrc.replace(/^\.\//, '').replace(/\//g, path.sep);
     const absImagePath = path.join(ROOT_DIR, normalizedRelPath);
     const imageExists = fs.existsSync(absImagePath);
@@ -95,11 +108,12 @@ requiredScenes.forEach(sceneId => {
   }
 });
 
-// 4. Test Export / Import JSON Lifecycle
-console.log('\n\x1b[36m[4/5] Testing JSON Export / Import Validation...\x1b[0m');
+// 5. Test Export / Import JSON Lifecycle
+console.log('\n\x1b[36m[5/6] Testing JSON Export / Import Validation...\x1b[0m');
 const exportPayload = {
-  app: "Lumina360",
-  version: "2.0",
+  app: "Razel360",
+  version: "2.5",
+  author: "Razel Tech",
   exportedAt: new Date().toISOString(),
   tour: demoVilla
 };
@@ -113,12 +127,12 @@ try {
 } catch (e) {
   console.error('Import parse failed:', e);
 }
-assert(!!parsedImport && parsedImport.tour, 'Import parser recognizes Lumina360 wrapper format');
+assert(!!parsedImport && parsedImport.tour, 'Import parser recognizes Razel360 wrapper format');
 assert(parsedImport.tour.scenes.length === 6, 'Imported tour preserves all 6 scenes intact');
 assert(parsedImport.tour.scenes[0].hotspots.length === demoVilla.scenes[0].hotspots.length, 'Hotspot arrays match exactly after serialization roundtrip');
 
-// 5. GitHub Pages Static Assets & Deployment Verification
-console.log('\n\x1b[36m[5/5] Checking Static Hosting & GitHub Pages Prep...\x1b[0m');
+// 6. GitHub Pages Static Assets & Deployment Verification
+console.log('\n\x1b[6/6] Checking Static Hosting & GitHub Pages Prep...\x1b[0m');
 const noJekyllPath = path.join(ROOT_DIR, '.nojekyll');
 assert(fs.existsSync(noJekyllPath), '.nojekyll exists to ensure GitHub Pages serves all assets');
 

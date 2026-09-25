@@ -2,13 +2,16 @@
 <html lang="en" class="h-full bg-neutral-950 text-slate-100 antialiased select-none">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LUMINA 360 | Luxury Architectural Showcase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Razel 360 | Luxury Virtual Showcase</title>
   
+  <!-- Favicon (Inline VR Cardboard Headset SVG) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M20.5 6h-17C2.1 6 1 7.1 1 8.5v7C1 16.9 2.1 18 3.5 18h4.8l2.2-3.3c.4-.6 1.1-1 1.8-1s1.4.4 1.8 1l2.2 3.3h4.2c1.4 0 2.5-1.1 2.5-2.5v-7c0-1.4-1.1-2.5-2.5-2.5zm-14 7c-1.4 0-2.5-1.1-2.5-2.5S5.1 8 6.5 8s2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zm11 0c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z'/%3E%3C/svg%3E">
+
   <!-- Architectural Typography (Plus Jakarta Sans & Outfit) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,13 +29,13 @@
     .font-display {
       font-family: 'Outfit', sans-serif;
     }
-    /* Monochromatic Grayish Glassmorphism (No loud saturated colors) */
+    /* Monochromatic Frosted Glassmorphism */
     .glass-frosted {
-      background: rgba(18, 22, 32, 0.75);
+      background: rgba(15, 18, 26, 0.78);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.85);
     }
     .glass-button {
       background: rgba(255, 255, 255, 0.08);
@@ -42,14 +45,18 @@
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .glass-button:hover {
-      background: rgba(255, 255, 255, 0.16);
-      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+    .glass-active {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.5);
     }
     /* Subtle Scrollbar */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 20, 30, 0.5); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 20, 30, 0.4); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.6); }
   </style>
 </head>
 
@@ -64,55 +71,50 @@
   <!-- Cardboard VR Center Split Line -->
   <div id="cardboard-divider" class="hidden fixed top-0 bottom-0 left-1/2 w-0.5 bg-neutral-800 z-40 pointer-events-none -translate-x-1/2"></div>
 
-  <!-- ==================== 2. PERMANENT LUXURY NAVIGATION CROSSHAIR ==================== -->
+  <!-- ==================== 2. NAVIGATION CROSSHAIR RETICLE ==================== -->
   <div id="crosshair-reticle" class="fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
-    <!-- Targeting Crosshair Notches -->
-    <div class="absolute w-2.5 h-[1.5px] -left-1.5 bg-white/70 rounded-full"></div>
-    <div class="absolute w-2.5 h-[1.5px] -right-1.5 bg-white/70 rounded-full"></div>
-    <div class="absolute h-2.5 w-[1.5px] -top-1.5 bg-white/70 rounded-full"></div>
-    <div class="absolute h-2.5 w-[1.5px] -bottom-1.5 bg-white/70 rounded-full"></div>
-    
-    <!-- Center Dot -->
+    <div class="absolute w-2 h-[1.5px] -left-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute w-2 h-[1.5px] -right-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute h-2 w-[1.5px] -top-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute h-2 w-[1.5px] -bottom-1.5 bg-white/70 rounded-full"></div>
     <div id="reticle-dot" class="w-1.5 h-1.5 bg-white rounded-full shadow-lg transition-transform duration-150"></div>
-    
-    <!-- Dwell Progress Ring for Gaze Teleportation -->
     <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
       <path id="dwell-ring" class="text-white/90 transition-all duration-75" stroke-dasharray="100" stroke-dashoffset="100" stroke-width="2.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
     </svg>
   </div>
 
   <!-- Placement Instruction Banner (In Editor Mode) -->
-  <div id="placement-alert" class="hidden fixed top-20 left-1/2 -translate-x-1/2 glass-frosted px-5 py-2.5 rounded-full shadow-2xl z-30 flex items-center space-x-3 border border-white/20">
+  <div id="placement-alert" class="hidden fixed top-20 left-1/2 -translate-x-1/2 glass-frosted px-4 py-2 rounded-full shadow-2xl z-30 flex items-center space-x-2.5 border border-white/20 text-xs">
     <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-    <span id="placement-alert-text" class="text-xs font-semibold text-slate-200">Click on any object to attach a 3D Callout Tag</span>
-    <button onclick="cancelPlacement()" class="text-slate-400 hover:text-white text-xs ml-2 underline">Cancel</button>
+    <span id="placement-alert-text" class="font-medium text-slate-200">Click on any object to attach a 3D Callout Tag</span>
+    <button onclick="cancelPlacement()" class="text-slate-400 hover:text-white underline ml-1.5">Cancel</button>
   </div>
 
-  <!-- ==================== 3. TOP NAVIGATION BAR ==================== -->
-  <header class="fixed top-0 left-0 right-0 h-16 px-4 md:px-6 flex items-center justify-between z-20 pointer-events-none">
+  <!-- ==================== 3. TOP NAVIGATION BAR (RESPONSIVE) ==================== -->
+  <header id="main-header" class="fixed top-0 left-0 right-0 h-14 md:h-16 px-3 md:px-6 flex items-center justify-between z-20 pointer-events-none">
     
-    <!-- Left: Brand Logo & Property Tour Switcher -->
-    <div class="flex items-center space-x-3 pointer-events-auto">
-      <div class="flex items-center space-x-2.5 glass-frosted px-3.5 py-2 rounded-xl">
-        <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold border border-white/15">
-          <i class="fa-solid fa-cube text-[11px]"></i>
+    <!-- Left: Brand Logo & Property Switcher -->
+    <div class="flex items-center space-x-2 pointer-events-auto">
+      <div class="flex items-center space-x-2 glass-frosted px-3 py-1.5 rounded-xl">
+        <div class="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold border border-white/15">
+          <i class="fa-solid fa-vr-cardboard text-[11px]"></i>
         </div>
         <div>
-          <span class="font-display font-bold text-xs tracking-wider uppercase text-white">LUMINA 360</span>
-          <p class="text-[9px] text-slate-400 font-medium">Virtual Showcase</p>
+          <span class="font-display font-bold text-xs tracking-wider uppercase text-white">RAZEL 360</span>
+          <p class="text-[8px] md:text-[9px] text-slate-400 font-medium">Virtual Tour</p>
         </div>
       </div>
 
       <!-- Property Switcher Modal Button -->
-      <button onclick="openTourPickerModal()" class="glass-button text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-lg">
-        <i class="fa-solid fa-building text-slate-400 text-xs"></i>
-        <span id="header-tour-name" class="font-display tracking-wide max-w-[140px] md:max-w-[200px] truncate">Villa Lumina</span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+      <button onclick="openTourPickerModal()" class="glass-button text-slate-200 px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
+        <i class="fa-solid fa-building text-slate-400 text-[11px]"></i>
+        <span id="header-tour-name" class="font-display tracking-wide max-w-[100px] md:max-w-[180px] truncate">Villa Lumina</span>
+        <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
       </button>
     </div>
 
     <!-- Center: Active Room Title Indicator -->
-    <div class="hidden md:flex items-center pointer-events-auto">
+    <div class="hidden lg:flex items-center pointer-events-auto">
       <div class="glass-frosted px-4 py-1.5 rounded-full flex items-center space-x-2">
         <span class="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse"></span>
         <span class="text-[11px] font-medium text-slate-400" id="header-room-step">Room 1 of 6:</span>
@@ -120,83 +122,92 @@
       </div>
     </div>
 
-    <!-- Right: Studio Toggle, VR, Gyro & Fullscreen -->
-    <div class="flex items-center space-x-2 pointer-events-auto">
+    <!-- Right: Auto Demo, Studio, VR, Audio & Fullscreen -->
+    <div class="flex items-center space-x-1.5 md:space-x-2 pointer-events-auto">
       
-      <!-- Studio / Edit Mode Switcher Button -->
-      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()" class="glass-button text-slate-300 hover:text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-        <i class="fa-solid fa-sliders text-xs"></i>
-        <span id="editor-btn-label">Tour Studio</span>
+      <!-- Auto Demo Play Button -->
+      <button id="btn-auto-demo" onclick="toggleAutoDemo()" class="glass-button text-slate-200 hover:text-white px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5" title="Play Automated Guided Tour">
+        <i class="fa-solid fa-play text-[10px]" id="demo-btn-icon"></i>
+        <span class="hidden sm:inline" id="demo-btn-label">Auto Demo</span>
       </button>
 
-      <!-- Cardboard VR Toggle -->
-      <button id="btn-cardboard" onclick="toggleCardboardVR()" class="glass-button text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-        <i class="fa-solid fa-vr-cardboard text-xs"></i>
-        <span class="hidden sm:inline" id="cardboard-btn-label">VR Mode</span>
+      <!-- Audio Mute Toggle -->
+      <button onclick="toggleAudio()" class="glass-button text-slate-300 hover:text-white p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center" title="Toggle Sound Effects">
+        <i class="fa-solid fa-volume-high text-[11px]" id="audio-icon"></i>
+      </button>
+
+      <!-- Studio Drawer Toggle -->
+      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()" class="glass-button text-slate-300 hover:text-white px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-sliders text-[11px]"></i>
+        <span class="hidden md:inline" id="editor-btn-label">Studio</span>
+      </button>
+
+      <!-- Cardboard VR Mode -->
+      <button id="btn-cardboard" onclick="toggleCardboardVR()" class="glass-button text-slate-300 hover:text-white px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-vr-cardboard text-[11px]"></i>
+        <span class="hidden sm:inline" id="cardboard-btn-label">VR</span>
       </button>
 
       <!-- Gyroscope Tilt Toggle (Mobile) -->
-      <button id="btn-gyro" onclick="toggleGyroscope()" class="glass-button text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-        <i class="fa-solid fa-compass text-xs"></i>
+      <button id="btn-gyro" onclick="toggleGyroscope()" class="glass-button text-slate-300 hover:text-white px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-compass text-[11px]"></i>
         <span class="hidden md:inline" id="gyro-btn-label">Tilt</span>
       </button>
 
       <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullscreen()" class="glass-button text-slate-300 hover:text-white p-2 rounded-xl text-xs w-9 h-9 flex items-center justify-center" title="Toggle Fullscreen">
-        <i class="fa-solid fa-expand"></i>
+      <button onclick="toggleFullscreen()" class="glass-button text-slate-300 hover:text-white p-1.5 md:p-2 rounded-xl text-xs w-8 h-8 md:w-9 md:h-9 flex items-center justify-center" title="Toggle Fullscreen">
+        <i class="fa-solid fa-expand text-[11px]"></i>
       </button>
     </div>
   </header>
 
-  <!-- ==================== 4. BOTTOM STREET VIEW DOCK & CAROUSEL ==================== -->
-  <div class="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-2 z-20 pointer-events-none px-4">
+  <!-- ==================== 4. BOTTOM STREET VIEW DOCK & CAROUSEL (RESPONSIVE) ==================== -->
+  <div id="main-bottom-dock" class="fixed bottom-3 md:bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-1.5 md:space-y-2 z-20 pointer-events-none px-2 md:px-4">
     
-    <!-- Street View Quick Room Strip -->
-    <div id="room-strip" class="pointer-events-auto glass-frosted p-1.5 rounded-2xl flex items-center space-x-1.5 overflow-x-auto max-w-full shadow-2xl transition-all duration-300">
-      <!-- Injected via JavaScript -->
-    </div>
+    <!-- Street View Room Quick Strip -->
+    <div id="room-strip" class="pointer-events-auto glass-frosted p-1 md:p-1.5 rounded-2xl flex items-center space-x-1 md:space-x-1.5 overflow-x-auto max-w-full shadow-2xl transition-all duration-300"></div>
 
-    <!-- Street View Navigation Dock: Optical Zoom, Gallery & Visualizer Info -->
-    <div class="pointer-events-auto flex items-center space-x-2">
+    <!-- Navigation Dock: Zoom, Gallery & Visualizer Info -->
+    <div class="pointer-events-auto flex items-center space-x-1.5 md:space-x-2">
       
-      <!-- Optical Zoom Controls (Google Street View Style) -->
-      <div class="glass-frosted px-2 py-1 rounded-xl flex items-center space-x-1 shadow-lg">
-        <button onclick="zoomStep(-1)" class="w-7 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom Out (-)">
-          <i class="fa-solid fa-minus"></i>
+      <!-- Optical Zoom Controls -->
+      <div class="glass-frosted px-1.5 md:px-2 py-1 rounded-xl flex items-center space-x-1 shadow-lg">
+        <button onclick="zoomStep(-1)" class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom Out (-)">
+          <i class="fa-solid fa-minus text-[10px]"></i>
         </button>
-        <button onclick="resetZoom()" class="px-2 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-[11px] font-mono font-bold" id="zoom-level-text" title="Reset Zoom">
+        <button onclick="resetZoom()" class="px-1.5 md:px-2 h-6 md:h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-[10px] md:text-[11px] font-mono font-bold" id="zoom-level-text" title="Reset Zoom">
           100%
         </button>
-        <button onclick="zoomStep(1)" class="w-7 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom In (+)">
-          <i class="fa-solid fa-plus"></i>
+        <button onclick="zoomStep(1)" class="w-6 h-6 md:w-7 md:h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom In (+)">
+          <i class="fa-solid fa-plus text-[10px]"></i>
         </button>
       </div>
 
       <!-- Quick Room Gallery Button -->
-      <button onclick="toggleSceneGalleryModal()" class="glass-button text-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-lg">
-        <i class="fa-solid fa-layer-group text-xs"></i>
-        <span>All Rooms (<span id="dock-room-count">6</span>)</span>
+      <button onclick="toggleSceneGalleryModal()" class="glass-button text-slate-200 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg">
+        <i class="fa-solid fa-layer-group text-slate-400 text-xs"></i>
+        <span>Rooms (<span id="dock-room-count">6</span>)</span>
       </button>
 
-      <!-- 3D Visualizer Render Guidelines Button -->
-      <button onclick="openDesignGuidelinesModal()" class="glass-button text-slate-400 hover:text-white p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center" title="360 Image Render Specs For Designers">
-        <i class="fa-solid fa-circle-info"></i>
+      <!-- 3D Visualizer Specs Modal Button -->
+      <button onclick="openDesignGuidelinesModal()" class="glass-button text-slate-400 hover:text-white p-1.5 rounded-xl text-xs w-7 h-7 md:w-8 md:h-8 flex items-center justify-center" title="360 Image Render Specs For Designers">
+        <i class="fa-solid fa-circle-info text-[11px]"></i>
       </button>
     </div>
   </div>
 
   <!-- ==================== 5. SLIDE-OUT STUDIO DRAWER (EDITOR) ==================== -->
-  <aside id="editor-drawer" class="fixed top-16 bottom-4 left-4 w-96 max-w-[calc(100vw-32px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
+  <aside id="editor-drawer" class="fixed top-14 md:top-16 bottom-3 md:bottom-4 left-3 md:left-4 w-96 max-w-[calc(100vw-24px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
     
     <!-- Drawer Header -->
-    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-black/30">
+    <div class="p-3.5 md:p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
       <div class="flex items-center space-x-2.5">
         <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs text-white">
           <i class="fa-solid fa-sliders"></i>
         </div>
         <div>
-          <h2 class="text-sm font-bold font-display text-white">Tour Studio</h2>
-          <p class="text-[10px] text-slate-400">Configure Rooms & Hotspots</p>
+          <h2 class="text-xs md:text-sm font-bold font-display text-white">Tour Studio Pro</h2>
+          <p class="text-[9px] md:text-[10px] text-slate-400 font-medium">Powered by Razel Tech</p>
         </div>
       </div>
       <button onclick="toggleEditorDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -205,13 +216,13 @@
     </div>
 
     <!-- Drawer Body -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div class="flex-1 overflow-y-auto p-3.5 md:p-4 space-y-4">
       
       <!-- Upload 360 Panorama Renders -->
-      <div class="p-3.5 rounded-xl border border-dashed border-white/20 bg-white/5 text-center">
+      <div class="p-3 rounded-xl border border-dashed border-white/20 bg-white/5 text-center">
         <label class="cursor-pointer block">
-          <i class="fa-solid fa-cloud-arrow-up text-white/80 text-xl mb-1.5"></i>
-          <p class="text-xs font-bold text-slate-200">Add 360° Panorama Renders</p>
+          <i class="fa-solid fa-cloud-arrow-up text-white/80 text-lg mb-1"></i>
+          <p class="text-xs font-bold text-slate-200">Upload 360° Panorama Renders</p>
           <p class="text-[10px] text-slate-400 mt-0.5">Equirectangular 2:1 ratio (JPG / PNG)</p>
           <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageBatch(event)">
         </label>
@@ -219,17 +230,17 @@
 
       <!-- Active Tour Rooms List -->
       <div>
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-1.5">
           <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rooms in Tour</h3>
           <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300 font-mono">6 Rooms</span>
         </div>
-        <div id="studio-scene-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+        <div id="studio-scene-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
       </div>
 
       <!-- Add Hotspots Section -->
-      <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-3">
+      <div class="p-3 rounded-xl bg-black/40 border border-white/10 space-y-2.5">
         <div class="flex items-center justify-between">
-          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Interactive Hotspots</h3>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Add Hotspots</h3>
           <span id="hotspot-badge-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300 font-mono">0 active</span>
         </div>
 
@@ -237,54 +248,54 @@
         <div class="grid grid-cols-2 gap-1.5 p-1 bg-black/50 rounded-xl border border-white/5">
           <button id="tab-portal-btn" onclick="switchHotspotTab('portal')" class="py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow">
             <i class="fa-solid fa-door-open text-[11px]"></i>
-            <span>Doorway</span>
+            <span>Doorstep</span>
           </button>
           <button id="tab-info-btn" onclick="switchHotspotTab('info')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5">
             <i class="fa-solid fa-tag text-[11px]"></i>
-            <span>3D Callout</span>
+            <span>Item Dot</span>
           </button>
         </div>
 
         <!-- Doorway Portal Settings -->
         <div id="tab-portal-panel" class="space-y-2">
-          <p class="text-[11px] text-slate-400">Connect spot to target room:</p>
+          <p class="text-[11px] text-slate-400">Connect floor doorstep to room:</p>
           <select id="portal-target-select" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40"></select>
           <button id="btn-arm-portal" onclick="armPlacement('portal')" class="w-full py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border border-white/20">
             <i class="fa-solid fa-location-crosshairs"></i>
-            <span id="portal-btn-label">Click on Floor to Place Doorway</span>
+            <span id="portal-btn-label">Place Floor Doorstep</span>
           </button>
         </div>
 
         <!-- 3D Callout Settings -->
         <div id="tab-info-panel" class="space-y-2 hidden">
           <div>
-            <label class="text-[10px] text-slate-400 font-semibold block mb-1">Item Title</label>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Item Title</label>
             <input type="text" id="info-title-input" placeholder="e.g. Minotti Italian Sectional" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-[10px] text-slate-400 font-semibold block mb-1">Category / Tag</label>
+              <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Category Tag</label>
               <input type="text" id="info-tag-input" placeholder="e.g. FURNITURE" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
             </div>
             <div>
-              <label class="text-[10px] text-slate-400 font-semibold block mb-1">Price Badge (optional)</label>
+              <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Price Tag</label>
               <input type="text" id="info-price-input" placeholder="e.g. $18,400" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
             </div>
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 font-semibold block mb-1">Description / Material Specs</label>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-0.5">Description / Specs</label>
             <textarea id="info-desc-input" rows="2" placeholder="e.g. Custom Bouclé fabric, dark bronze trim, modular deep seating" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40 resize-none"></textarea>
           </div>
           <button id="btn-arm-info" onclick="armPlacement('info')" class="w-full py-2 bg-white/20 hover:bg-white/30 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 border border-white/25">
             <i class="fa-solid fa-tag"></i>
-            <span id="info-btn-label">Click on Object to Place Callout</span>
+            <span id="info-btn-label">Place Item Beacon Dot</span>
           </button>
         </div>
 
         <!-- Hotspots in Current Room -->
         <div class="pt-2 border-t border-white/10">
-          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1.5">Hotspots in this room:</div>
-          <div id="room-hotspots-editor-list" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Hotspots in this room:</div>
+          <div id="room-hotspots-editor-list" class="space-y-1 max-h-28 overflow-y-auto pr-1"></div>
         </div>
       </div>
     </div>
@@ -292,22 +303,22 @@
     <!-- Drawer Footer Actions -->
     <div class="p-3 border-t border-white/10 bg-black/40 flex items-center justify-between space-x-2">
       <button onclick="exportCurrentTourJSON()" class="flex-1 py-1.5 glass-button text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1">
-        <i class="fa-solid fa-download text-[11px]"></i> <span>Export Tour</span>
+        <i class="fa-solid fa-download text-[10px]"></i> <span>Export Tour</span>
       </button>
       <label class="flex-1 py-1.5 glass-button text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1 cursor-pointer">
-        <i class="fa-solid fa-upload text-[11px]"></i> <span>Import Tour</span>
+        <i class="fa-solid fa-upload text-[10px]"></i> <span>Import Tour</span>
         <input type="file" id="import-tour-file" accept=".json" class="hidden" onchange="importTourJSON(event)">
       </label>
     </div>
   </aside>
 
   <!-- ==================== 6. PROPERTY TOUR SELECTOR MODAL ==================== -->
-  <div id="modal-tour-picker" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-    <div class="glass-frosted w-full max-w-xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+  <div id="modal-tour-picker" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
-          <h2 class="text-lg font-bold font-display text-white">Select Property Showcase</h2>
-          <p class="text-xs text-slate-400">Switch between multi-house 360 virtual tours</p>
+          <h2 class="text-base md:text-lg font-bold font-display text-white">Property Tours Portfolio</h2>
+          <p class="text-xs text-slate-400">Switch between multi-house 360 showcases</p>
         </div>
         <button onclick="closeTourPickerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -329,16 +340,16 @@
   </div>
 
   <!-- ==================== 7. DESIGNER GUIDELINES MODAL ==================== -->
-  <div id="modal-designer-guidelines" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-    <div class="glass-frosted w-full max-w-2xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+  <div id="modal-designer-guidelines" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-2xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15">
             <i class="fa-solid fa-camera-rotate"></i>
           </div>
           <div>
-            <h2 class="text-lg font-bold font-display text-white">360° Visualizer Render Specs</h2>
-            <p class="text-xs text-slate-400">Give these exact instructions to your 3D architectural rendering artists</p>
+            <h2 class="text-base md:text-lg font-bold font-display text-white">360° Render Specs for 3D Visualizers</h2>
+            <p class="text-xs text-slate-400">Standard studio handoff for 3ds Max / Corona / V-Ray / Blender / UE5</p>
           </div>
         </div>
         <button onclick="closeDesignGuidelinesModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
@@ -352,7 +363,7 @@
             <i class="fa-solid fa-ruler-combined text-slate-400"></i>
             <span>1. Aspect Ratio & Dimensions (Strict 2:1)</span>
           </h4>
-          <p>All renders MUST be rendered with a <strong>strict 2:1 aspect ratio</strong> using an <strong>Equirectangular (Spherical 360°) Camera</strong>. Recommended resolutions:</p>
+          <p>Renders must be output with a <strong>strict 2:1 aspect ratio</strong> using an <strong>Equirectangular 360° Spherical Camera</strong>. Recommended resolutions:</p>
           <ul class="list-disc list-inside mt-1 space-y-0.5 text-slate-400">
             <li><strong>Production Standard:</strong> 4096 × 2048 px (Sharp, fast mobile loading)</li>
             <li><strong>Ultra 8K Luxury:</strong> 6144 × 3072 px or 8192 × 4096 px</li>
@@ -364,7 +375,7 @@
             <i class="fa-solid fa-person-walking text-slate-400"></i>
             <span>2. Camera Height & Level Horizon</span>
           </h4>
-          <p>Camera height must strictly mimic natural human standing eye-level: <strong>1.55m to 1.65m (5.1 – 5.4 ft)</strong> above the finished floor level. Keep camera Pitch and Roll perfectly at <strong>0 degrees</strong> to prevent dizzying tilts.</p>
+          <p>Camera height must strictly mimic natural human standing eye-level: <strong>1.55m to 1.65m (5.1 – 5.4 ft)</strong> above the finished floor level. Keep camera Pitch and Roll perfectly at <strong>0 degrees</strong> to prevent dizzying perspective tilts.</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
@@ -372,7 +383,7 @@
             <i class="fa-solid fa-sliders text-slate-400"></i>
             <span>3. Color Space & Lighting Continuity</span>
           </h4>
-          <p>Export in <strong>sRGB color profile</strong> (PNG or high-quality JPEG). Ensure window lighting and exterior time-of-day match across adjacent rooms (e.g. living room, kitchen, and balcony share identical golden hour sky illumination).</p>
+          <p>Export in <strong>sRGB color profile</strong> (PNG or high-quality JPEG 95%). Ensure window lighting and exterior time-of-day match across adjacent rooms (e.g. living room, kitchen, and balcony share identical golden hour sky illumination).</p>
         </div>
       </div>
 
@@ -385,18 +396,18 @@
   </div>
 
   <!-- ==================== 8. ROOM GALLERY MODAL ==================== -->
-  <div id="modal-scene-gallery" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-    <div class="glass-frosted w-full max-w-3xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+  <div id="modal-scene-gallery" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-3xl rounded-3xl p-5 md:p-6 border border-white/15 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
-          <h2 class="text-lg font-bold font-display text-white">Residence Floor Navigation</h2>
+          <h2 class="text-base md:text-lg font-bold font-display text-white">Residence Floor Navigation</h2>
           <p class="text-xs text-slate-400">Click any room to navigate directly</p>
         </div>
         <button onclick="toggleSceneGalleryModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      <div id="gallery-cards-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3.5 max-h-96 overflow-y-auto pr-1"></div>
+      <div id="gallery-cards-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto pr-1"></div>
     </div>
   </div>
 
@@ -587,6 +598,12 @@
     let placementType = 'portal'; // 'portal' | 'info'
     let isCardboardVR = false;
     let isGyroActive = false;
+    let isAudioEnabled = true;
+
+    // Automated Demo Guided Walkthrough
+    let isAutoDemoActive = false;
+    let autoDemoTimer = null;
+    let autoDemoStep = 0;
 
     // Three.js Core
     let scene, camera, renderer, sphereMesh;
@@ -606,6 +623,77 @@
 
     // Gyroscope
     let deviceOrientation = { alpha: 0, beta: 0, gamma: 0 };
+
+    // Web Audio Synthesizer (No MP3 dependencies)
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) audioCtx = new AudioClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playPopSound() {
+      if (!isAudioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } catch (e) {}
+    }
+
+    function playWhooshSound() {
+      if (!isAudioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      isAudioEnabled = !isAudioEnabled;
+      const icon = document.getElementById('audio-icon');
+      if (isAudioEnabled) {
+        icon.className = "fa-solid fa-volume-high text-[11px]";
+        playPopSound();
+      } else {
+        icon.className = "fa-solid fa-volume-xmark text-[11px] text-slate-500";
+      }
+    }
 
     // ---------- INITIALIZATION ----------
     window.onload = function() {
@@ -633,8 +721,8 @@
 
       container.appendChild(renderer.domElement);
 
-      // Inverted 360 Panorama Sphere
-      const sphereGeo = new THREE.SphereGeometry(500, 64, 48);
+      // Higher-tessellation Inverted Sphere to eliminate cut seams
+      const sphereGeo = new THREE.SphereGeometry(500, 80, 50);
       sphereGeo.scale(-1, 1, 1);
       
       const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0a0f1d, toneMapped: false });
@@ -666,7 +754,7 @@
       renderer.setSize(w, h);
     }
 
-    // ---------- SCENE LOADING & TRANSITIONS ----------
+    // ---------- SCENE LOADING & SEAMLESS 360 TEXTURING ----------
     function getActiveTour() {
       return appState.tours.find(t => t.id === appState.activeTourId) || appState.tours[0];
     }
@@ -687,8 +775,15 @@
         const loader = new THREE.TextureLoader();
         loader.load(targetScene.imageSrc, (texture) => {
           texture.encoding = THREE.sRGBEncoding;
+          // Smooth seamless wrap & max anisotropic sharpness
+          texture.wrapS = THREE.RepeatWrapping;
+          texture.wrapT = THREE.ClampToEdgeWrapping;
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
+          if (renderer.capabilities && renderer.capabilities.getMaxAnisotropy) {
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          }
+
           sphereMesh.material.map = texture;
           sphereMesh.material.color.setHex(0xffffff);
           sphereMesh.material.needsUpdate = true;
@@ -698,6 +793,7 @@
         renderAllUI();
 
         if (isWalkThrough) {
+          playWhooshSound();
           document.getElementById('transition-curtain').style.opacity = '0';
         }
       };
@@ -710,8 +806,54 @@
       }
     }
 
-    // ---------- 2X RETINA DYNAMIC CANVAS CALLOUT TEXTURE GENERATOR ----------
-    // Frosted graphite/charcoal card with subtle silver borders (NO loud blues or greens)
+    // ---------- AUTOMATED DEMO MODE (AUTONOMOUS TOUR) ----------
+    function toggleAutoDemo() {
+      isAutoDemoActive = !isAutoDemoActive;
+      const btn = document.getElementById('btn-auto-demo');
+      const icon = document.getElementById('demo-btn-icon');
+      const label = document.getElementById('demo-btn-label');
+
+      if (isAutoDemoActive) {
+        btn.classList.add('glass-active', 'text-white');
+        icon.className = "fa-solid fa-pause text-[10px]";
+        label.innerText = "Pause Demo";
+        if (isEditorOpen) toggleEditorDrawer();
+        startAutoTourLoop();
+      } else {
+        btn.classList.remove('glass-active', 'text-white');
+        icon.className = "fa-solid fa-play text-[10px]";
+        label.innerText = "Auto Demo";
+        stopAutoTourLoop();
+      }
+    }
+
+    function startAutoTourLoop() {
+      stopAutoTourLoop();
+      let stepCounter = 0;
+
+      autoDemoTimer = setInterval(() => {
+        if (!isAutoDemoActive) return;
+        stepCounter++;
+
+        // Every 7 seconds, transition smoothly to the next room in sequence
+        if (stepCounter % 28 === 0) {
+          const tour = getActiveTour();
+          const curIdx = tour.scenes.findIndex(s => s.id === appState.activeSceneId);
+          const nextIdx = (curIdx + 1) % tour.scenes.length;
+          switchScene(tour.scenes[nextIdx].id, true);
+        }
+      }, 250);
+    }
+
+    function stopAutoTourLoop() {
+      if (autoDemoTimer) {
+        clearInterval(autoDemoTimer);
+        autoDemoTimer = null;
+      }
+    }
+
+    // ---------- 2X RETINA CANVAS CALLOUT TEXTURE GENERATOR ----------
+    // Frosted graphite card with high-contrast text and crisp pills
     function createLuxuryCalloutTexture(item) {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
@@ -725,44 +867,41 @@
       const radius = 32;
 
       // 1. Frosted Graphite Glass Card Background
-      ctx.fillStyle = 'rgba(16, 20, 30, 0.92)';
+      ctx.fillStyle = 'rgba(16, 20, 30, 0.95)';
       roundRect(ctx, cardX, cardY, cardW, cardH, radius);
       ctx.fill();
 
-      // 2. Crisp Subtle Platinum Border Highlight
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.20)';
+      // 2. Crisp White/Silver Border Highlight
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = 4;
       ctx.stroke();
 
       // 3. Category / Tag Pill (Top Left)
       const tagText = (item.tag || 'INTERIOR ARCHITECTURE').toUpperCase();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
-      roundRect(ctx, cardX + 44, cardY + 44, 300, 48, 14);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      roundRect(ctx, cardX + 44, cardY + 44, 310, 50, 14);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      ctx.fillStyle = '#e2e8f0';
+      ctx.fillStyle = '#f1f5f9';
       ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(tagText, cardX + 194, cardY + 68);
+      ctx.fillText(tagText, cardX + 199, cardY + 69);
 
-      // 4. Price Badge Pill (Top Right, Monochromatic Luxury Glass)
+      // 4. Price Badge Pill (Top Right, Clean Solid White Pill with Dark Text for Maximum Contrast)
       if (item.price && item.price.trim().length > 0) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+        ctx.fillStyle = '#ffffff';
         roundRect(ctx, cardX + cardW - 240, cardY + 44, 196, 50, 14);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#0f172a'; // Deep charcoal black text on solid white pill
         ctx.font = 'bold 28px "Outfit", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(item.price.trim(), cardX + cardW - 142, cardY + 68);
+        ctx.fillText(item.price.trim(), cardX + cardW - 142, cardY + 69);
       }
 
       // 5. Item Title (Large, Bold Architectural Font)
@@ -773,17 +912,17 @@
       ctx.fillText(truncateText(ctx, item.title || 'Featured Detail', 860), cardX + 44, cardY + 165);
 
       // 6. Hairline Divider
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(cardX + 44, cardY + 200);
       ctx.lineTo(cardX + cardW - 44, cardY + 200);
       ctx.stroke();
 
-      // 7. Description / Specs Text
+      // 7. Description / Specs Text (High-contrast bright silver)
       if (item.description && item.description.trim()) {
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '30px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '31px "Plus Jakarta Sans", sans-serif';
         ctx.textBaseline = 'alphabetic';
         wrapText(ctx, item.description, cardX + 44, cardY + 265, 860, 44, 3);
       }
@@ -839,13 +978,12 @@
       ctx.fillText(line, x, curY);
     }
 
-    // ---------- 3D HOTSPOTS ENGINE (BEACONS & ARROW LEADER LINE POPUPS) ----------
+    // ---------- 3D HOTSPOTS ENGINE ----------
+    // Google Maps Style Doorstep Disc for Portals, Small Beacon Dot for Callouts
     function rebuildHotspotMeshes() {
-      // Clear Portals
       portalMeshes.forEach(m => scene.remove(m));
       portalMeshes = [];
 
-      // Clear Callout Billboard meshes & dispose textures
       infoHotspotMeshes.forEach(m => {
         if (m.userData.card && m.userData.card.material && m.userData.card.material.map) {
           m.userData.card.material.map.dispose();
@@ -861,32 +999,41 @@
         if (hs.type === 'info') {
           create3DCalloutMesh(hs);
         } else {
-          create3DPortalMesh(hs);
+          create3DPortalDoorstepMesh(hs);
         }
       });
     }
 
-    function create3DPortalMesh(hs) {
+    // 1. Google Street View Style Floor Doorstep Ring & Chevron
+    function create3DPortalDoorstepMesh(hs) {
       const portalGroup = new THREE.Group();
 
-      // Outer Street View Ring (White/Silver Translucent)
-      const ringGeo = new THREE.RingGeometry(18, 24, 32);
+      // Outer Floor Navigation Disc
+      const ringGeo = new THREE.RingGeometry(16, 22, 32);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.80
+        opacity: 0.85
       });
       const ringMesh = new THREE.Mesh(ringGeo, ringMat);
       ringMesh.rotation.x = Math.PI / 2;
       portalGroup.add(ringMesh);
 
-      // Direction Chevron
-      const arrowGeo = new THREE.ConeGeometry(8, 16, 4);
-      const arrowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-      const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
-      arrowMesh.rotation.x = Math.PI / 2;
-      portalGroup.add(arrowMesh);
+      // Inner Center Circle Dot (The signature Google Maps doorway mark)
+      const dotGeo = new THREE.CircleGeometry(6, 24);
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+      const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+      dotMesh.rotation.x = Math.PI / 2;
+      portalGroup.add(dotMesh);
+
+      // Forward Direction Pointer Chevron
+      const chevronGeo = new THREE.ConeGeometry(7, 14, 16);
+      const chevronMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.DoubleSide });
+      const chevronMesh = new THREE.Mesh(chevronGeo, chevronMat);
+      chevronMesh.rotation.x = Math.PI / 2;
+      chevronMesh.position.y = 0.5;
+      portalGroup.add(chevronMesh);
 
       portalGroup.position.set(hs.x, hs.y, hs.z);
       portalGroup.lookAt(0, 0, 0);
@@ -896,62 +1043,55 @@
       portalMeshes.push(portalGroup);
     }
 
+    // 2. Item Callout with Small Dot Beacon, Rising Arrow Stem & Large Card
     function create3DCalloutMesh(hs) {
       const group = new THREE.Group();
       group.position.set(hs.x, hs.y, hs.z);
 
-      // 1. Center Metallic Beacon Pin (Sits on item surface)
-      const beaconGeo = new THREE.SphereGeometry(5, 16, 16);
-      const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-      group.add(beacon);
+      // 1. Sleek Small Beacon Dot (Radius 3.5, subtle on furniture/item surface)
+      const dotGeo = new THREE.SphereGeometry(3.5, 16, 16);
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      group.add(dot);
 
-      // 2. Pulse Ring
-      const pulseGeo = new THREE.RingGeometry(6, 10, 32);
+      // Subtle Pulse Dot Ring
+      const pulseGeo = new THREE.RingGeometry(4, 7, 24);
       const pulseMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.75
+        opacity: 0.7
       });
       const pulseRing = new THREE.Mesh(pulseGeo, pulseMat);
       group.add(pulseRing);
 
-      // 3. Leader Line Stem (Animates upward from beacon when crosshair hovers)
-      const STEM_MAX_HEIGHT = 34;
-      const stemGeo = new THREE.CylinderGeometry(0.7, 0.7, STEM_MAX_HEIGHT, 8);
-      stemGeo.translate(0, STEM_MAX_HEIGHT / 2, 0); // Pivot at base (0,0,0)
-      const stemMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0
-      });
+      // 2. Leader Stem Line (Animates upward from dot beacon)
+      const STEM_MAX_HEIGHT = 38;
+      const stemGeo = new THREE.CylinderGeometry(0.8, 0.8, STEM_MAX_HEIGHT, 8);
+      stemGeo.translate(0, STEM_MAX_HEIGHT / 2, 0);
+      const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
       const stemMesh = new THREE.Mesh(stemGeo, stemMat);
-      stemMesh.scale.set(1, 0, 1); // Initially collapsed at height 0
+      stemMesh.scale.set(1, 0, 1);
       group.add(stemMesh);
 
-      // 4. Arrowhead pointing up at top of stem
-      const arrowGeo = new THREE.ConeGeometry(3, 6, 8);
-      arrowGeo.translate(0, 3, 0);
-      const arrowMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0
-      });
+      // 3. Arrowhead pointing up at the tip of the stem
+      const arrowGeo = new THREE.ConeGeometry(3.5, 7, 8);
+      arrowGeo.translate(0, 3.5, 0);
+      const arrowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
       const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
       arrowMesh.position.set(0, 0, 0);
       arrowMesh.scale.set(0, 0, 0);
       group.add(arrowMesh);
 
-      // 5. Forgiving Invisible Hit Box for Gaze/Mouse Raycasting
+      // 4. Hit Box for Gaze/Mouse Raycasting
       const hitGeo = new THREE.SphereGeometry(26, 8, 8);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitMesh = new THREE.Mesh(hitGeo, hitMat);
       group.add(hitMesh);
 
-      // 6. 2X Retina Billboard Card Plane (Large, 84x42 units, readable at any zoom)
+      // 5. 2X Retina Billboard Card Plane (Large 96x48, ultra-readable at 100% zoom)
       const cardTexture = createLuxuryCalloutTexture(hs);
-      const cardGeo = new THREE.PlaneGeometry(84, 42);
+      const cardGeo = new THREE.PlaneGeometry(96, 48);
       const cardMat = new THREE.MeshBasicMaterial({
         map: cardTexture,
         transparent: true,
@@ -961,8 +1101,7 @@
       });
 
       const cardMesh = new THREE.Mesh(cardGeo, cardMat);
-      // Floats above the arrowhead tip
-      cardMesh.position.set(0, STEM_MAX_HEIGHT + 23, 0);
+      cardMesh.position.set(0, STEM_MAX_HEIGHT + 27, 0);
       cardMesh.scale.set(0.1, 0.1, 0.1);
       cardMesh.renderOrder = 999;
       group.add(cardMesh);
@@ -970,14 +1109,15 @@
       group.userData = {
         id: hs.id,
         type: 'info',
-        beacon: beacon,
+        beacon: dot,
         pulseRing: pulseRing,
         stem: stemMesh,
         arrow: arrowMesh,
         stemMaxHeight: STEM_MAX_HEIGHT,
         hitBox: hitMesh,
         card: cardMesh,
-        animProgress: 0.0 // 0 = closed, 1 = fully open
+        animProgress: 0.0,
+        wasHovered: false
       };
 
       scene.add(group);
@@ -1014,6 +1154,14 @@
 
         const isTargeted = (group === activeCallout);
 
+        // Sound trigger when hover begins
+        if (isTargeted && !group.userData.wasHovered) {
+          playPopSound();
+          group.userData.wasHovered = true;
+        } else if (!isTargeted && group.userData.wasHovered) {
+          group.userData.wasHovered = false;
+        }
+
         // Smooth animation progress interpolation
         if (isTargeted) {
           group.userData.animProgress = THREE.MathUtils.lerp(group.userData.animProgress, 1.0, 0.20);
@@ -1023,7 +1171,7 @@
 
         const t = group.userData.animProgress;
 
-        // Stage 1 (0 to 0.45): Stem draws upward from beacon pin
+        // Stage 1 (0 to 0.45): Stem line draws upward from small beacon dot
         const stemProgress = Math.min(1.0, t / 0.45);
         stem.scale.set(1, stemProgress, 1);
         stem.material.opacity = stemProgress * 0.9;
@@ -1034,25 +1182,25 @@
         arrow.scale.set(stemProgress, stemProgress, stemProgress);
         arrow.material.opacity = stemProgress;
 
-        // Stage 2 (0.4 to 1.0): Card pops open at tip of arrow with spring ease-out
+        // Stage 2 (0.4 to 1.0): Card pops open at tip of arrow
         const cardProgress = Math.max(0.0, (t - 0.4) / 0.6);
         
-        // Dynamically scale card slightly with FOV so it remains ultra-readable at all zoom levels
-        const zoomCompensation = (camera.fov / 75);
-        const baseScale = THREE.MathUtils.lerp(0.1, 1.0, cardProgress) * Math.max(0.85, zoomCompensation);
+        // Zoom Compensation: Keeps card comfortably large & readable at any FOV zoom level
+        const zoomRatio = (camera.fov / 75);
+        const cardScale = THREE.MathUtils.lerp(0.1, 1.0, cardProgress) * Math.max(0.9, zoomRatio);
         
-        card.scale.set(baseScale, baseScale, baseScale);
+        card.scale.set(cardScale, cardScale, cardScale);
         card.material.opacity = cardProgress;
 
-        // Pulse ring subtle feedback
+        // Pulse dot feedback
         if (isTargeted) {
-          pulse.scale.lerp(new THREE.Vector3(1.3, 1.3, 1.3), 0.2);
+          pulse.scale.lerp(new THREE.Vector3(1.35, 1.35, 1.35), 0.2);
         } else {
           pulse.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.15);
         }
       });
 
-      // Reticle Targeting Feedback
+      // Reticle feedback
       const dot = document.getElementById('reticle-dot');
       if (dot && !targetedPortal) {
         if (activeCallout) {
@@ -1062,7 +1210,7 @@
         }
       }
 
-      // Check Street View Gaze Teleportation for Portals
+      // Check Street View Gaze Teleportation for Floor Doorstep Rings
       checkPortalTeleport(raycaster);
     }
 
@@ -1131,8 +1279,11 @@
       targetFov = (targetFov < 60) ? 75 : 45;
     }
 
-    // ---------- DRAG & GYROSCOPE CONTROLS ----------
+    // ---------- DRAG & MOBILE GYROSCOPE CONTROLS ----------
     function onPointerDown(e) {
+      // If user drags manually, pause auto-demo
+      if (isAutoDemoActive) toggleAutoDemo();
+
       isDragging = true;
       dragStartX = e.clientX;
       dragStartY = e.clientY;
@@ -1153,7 +1304,7 @@
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
           DeviceOrientationEvent.requestPermission().then(state => {
             if (state === 'granted') bindOrientationListener();
-            else alert("Gyroscope tilt access was denied by your browser.");
+            else alert("Gyroscope access was denied. Note: iOS and Android require HTTPS (e.g. GitHub Pages) for sensor access.");
           }).catch(console.error);
         } else {
           bindOrientationListener();
@@ -1166,14 +1317,14 @@
     function bindOrientationListener() {
       window.addEventListener('deviceorientation', handleOrientationEvent, true);
       isGyroActive = true;
-      document.getElementById('btn-gyro').classList.add('bg-white/30', 'text-white');
+      document.getElementById('btn-gyro').classList.add('glass-active', 'text-white');
       document.getElementById('gyro-btn-label').innerText = "Tilt On";
     }
 
     function unbindOrientationListener() {
       window.removeEventListener('deviceorientation', handleOrientationEvent, true);
       isGyroActive = false;
-      document.getElementById('btn-gyro').classList.remove('bg-white/30', 'text-white');
+      document.getElementById('btn-gyro').classList.remove('glass-active', 'text-white');
       document.getElementById('gyro-btn-label').innerText = "Tilt";
     }
 
@@ -1188,22 +1339,35 @@
       camera.quaternion.multiply(new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)));
     }
 
-    // ---------- CARDBOARD VR STEREOSCOPIC MODE ----------
+    // ---------- CARDBOARD VR STEREOSCOPIC MODE (PURE 3D IMMERSION) ----------
     function toggleCardboardVR() {
       isCardboardVR = !isCardboardVR;
       const divider = document.getElementById('cardboard-divider');
       const btn = document.getElementById('btn-cardboard');
       const label = document.getElementById('cardboard-btn-label');
+      const header = document.getElementById('main-header');
+      const bottomDock = document.getElementById('main-bottom-dock');
+      const reticle = document.getElementById('crosshair-reticle');
 
       if (isCardboardVR) {
         divider.classList.remove('hidden');
-        btn.classList.add('bg-white/30', 'text-white');
+        btn.classList.add('glass-active', 'text-white');
         label.innerText = "Exit VR";
+
+        // CRITICAL FOR CARDBOARD: Hide all 2D HTML UI elements so stereoscopic 3D view is completely clean!
+        header.classList.add('hidden');
+        bottomDock.classList.add('hidden');
+        reticle.classList.remove('hidden');
+
         if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
       } else {
         divider.classList.add('hidden');
-        btn.classList.remove('bg-white/30', 'text-white');
-        label.innerText = "VR Mode";
+        btn.classList.remove('glass-active', 'text-white');
+        label.innerText = "VR";
+
+        header.classList.remove('hidden');
+        bottomDock.classList.remove('hidden');
+
         if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
       }
       onWindowResize();
@@ -1226,12 +1390,12 @@
 
       if (isEditorOpen) {
         drawer.classList.remove('-translate-x-[115%]');
-        btn.classList.add('bg-white/30', 'text-white');
-        label.innerText = "Close Studio";
+        btn.classList.add('glass-active', 'text-white');
+        label.innerText = "Close";
       } else {
         drawer.classList.add('-translate-x-[115%]');
-        btn.classList.remove('bg-white/30', 'text-white');
-        label.innerText = "Tour Studio";
+        btn.classList.remove('glass-active', 'text-white');
+        label.innerText = "Studio";
         cancelPlacement();
       }
     }
@@ -1267,11 +1431,11 @@
       if (isPlacementArmed) {
         alertBox.classList.remove('hidden');
         if (placementType === 'portal') {
-          alertText.innerText = "Click on the floor or doorway to set connection portal";
-          pBtnText.innerText = "Cancel Portal Placement";
+          alertText.innerText = "Click on the floor or doorway to set floor doorstep mark";
+          pBtnText.innerText = "Cancel Placement";
         } else {
-          alertText.innerText = "Click on any furniture or object to attach callout tag";
-          iBtnText.innerText = "Cancel Callout Placement";
+          alertText.innerText = "Click on any furniture or object to attach callout beacon dot";
+          iBtnText.innerText = "Cancel Placement";
         }
       } else {
         cancelPlacement();
@@ -1281,12 +1445,18 @@
     function cancelPlacement() {
       isPlacementArmed = false;
       document.getElementById('placement-alert').classList.add('hidden');
-      document.getElementById('portal-btn-label').innerText = "Click on Floor to Place Doorway";
-      document.getElementById('info-btn-label').innerText = "Click on Object to Place Callout";
+      document.getElementById('portal-btn-label').innerText = "Place Floor Doorstep";
+      document.getElementById('info-btn-label').innerText = "Place Item Beacon Dot";
     }
 
     function onCanvasClick(e) {
-      // 1. If in placement mode, place hotspot
+      // If in Cardboard VR mode: tap on screen triggers optical zoom in/out
+      if (isCardboardVR) {
+        targetFov = (targetFov < 60) ? 75 : 45;
+        return;
+      }
+
+      // If in placement mode: place hotspot
       if (isPlacementArmed) {
         const mouse = new THREE.Vector2(
           (e.clientX / window.innerWidth) * 2 - 1,
@@ -1330,11 +1500,12 @@
           rebuildHotspotMeshes();
           renderAllUI();
           cancelPlacement();
+          playPopSound();
         }
         return;
       }
 
-      // 2. Direct click interaction for Portals (in addition to gaze dwell)
+      // Direct click interaction for Floor Doorsteps
       const clickRaycaster = new THREE.Raycaster();
       clickRaycaster.setFromCamera(new THREE.Vector2(
         (e.clientX / window.innerWidth) * 2 - 1,
@@ -1406,11 +1577,11 @@
       tour.scenes.forEach(s => {
         const isActive = s.id === current.id;
         const btn = document.createElement('button');
-        btn.className = `flex items-center space-x-2 px-3 py-1.5 rounded-xl transition shrink-0 ${isActive ? 'bg-white/20 border border-white/40 text-white shadow-lg' : 'bg-white/5 hover:bg-white/10 border border-white/5 text-slate-300'}`;
+        btn.className = `flex items-center space-x-1.5 md:space-x-2 px-2.5 md:px-3 py-1 md:py-1.5 rounded-xl transition shrink-0 ${isActive ? 'glass-active border border-white/40 text-white shadow-lg' : 'bg-white/5 hover:bg-white/10 border border-white/5 text-slate-300'}`;
         btn.onclick = () => switchScene(s.id, true);
         btn.innerHTML = `
-          <div class="w-6 h-5 rounded-md bg-cover bg-center shrink-0 border border-white/10" style="background-image: url('${s.imageSrc}')"></div>
-          <span class="text-xs font-semibold font-display truncate max-w-[110px]">${s.name}</span>
+          <div class="w-5 h-4 md:w-6 md:h-5 rounded-md bg-cover bg-center shrink-0 border border-white/10" style="background-image: url('${s.imageSrc}')"></div>
+          <span class="text-[11px] md:text-xs font-semibold font-display truncate max-w-[80px] md:max-w-[110px]">${s.name}</span>
         `;
         stripContainer.appendChild(btn);
       });
@@ -1460,7 +1631,7 @@
           if (h.type === 'info') {
             row.innerHTML = `
               <div class="flex items-center space-x-1.5 truncate">
-                <i class="fa-solid fa-tag text-slate-300 text-[10px]"></i>
+                <i class="fa-solid fa-circle text-[7px] text-white"></i>
                 <span class="text-slate-200 font-medium truncate">${h.title}</span>
                 ${h.price ? `<span class="text-white font-bold ml-1">${h.price}</span>` : ''}
               </div>
@@ -1471,7 +1642,7 @@
             row.innerHTML = `
               <div class="flex items-center space-x-1.5 truncate">
                 <i class="fa-solid fa-door-open text-slate-300 text-[10px]"></i>
-                <span class="text-slate-300 truncate">Doorway &rarr; <span class="text-white font-medium">${tgt ? tgt.name : 'Next Room'}</span></span>
+                <span class="text-slate-300 truncate">Doorstep &rarr; <span class="text-white font-medium">${tgt ? tgt.name : 'Next Room'}</span></span>
               </div>
               <button onclick="deleteHotspot('${h.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
             `;
@@ -1513,7 +1684,7 @@
       appState.tours.forEach(t => {
         const isActive = t.id === appState.activeTourId;
         const card = document.createElement('div');
-        card.className = `p-3.5 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'bg-white/20 border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
+        card.className = `p-3.5 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'glass-active border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
         card.onclick = () => {
           appState.activeTourId = t.id;
           appState.activeSceneId = t.scenes[0].id;
@@ -1589,7 +1760,7 @@
         tour.scenes.forEach(s => {
           const isActive = s.id === appState.activeSceneId;
           const card = document.createElement('div');
-          card.className = `p-2 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'bg-white/20 border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
+          card.className = `p-2 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'glass-active border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
           card.onclick = () => {
             modal.classList.add('hidden');
             switchScene(s.id, true);
@@ -1639,8 +1810,9 @@
     function exportCurrentTourJSON() {
       const tour = getActiveTour();
       const exportData = {
-        app: "Lumina360",
-        version: "2.0",
+        app: "Razel360",
+        version: "2.5",
+        author: "Razel Tech",
         exportedAt: new Date().toISOString(),
         tour: tour
       };
@@ -1658,7 +1830,7 @@
       reader.onload = (e) => {
         try {
           const imported = JSON.parse(e.target.result);
-          const tourData = imported.tour || imported; // Supports both wrapper format and raw tour format
+          const tourData = imported.tour || imported;
           if (tourData.scenes && Array.isArray(tourData.scenes) && tourData.scenes.length > 0) {
             tourData.id = 'tour_' + Date.now();
             appState.tours.push(tourData);
@@ -1681,6 +1853,11 @@
     // ---------- THREE.JS MAIN RENDER LOOP ----------
     function renderLoop() {
       requestAnimationFrame(renderLoop);
+
+      // Automated Demo Guided Walkthrough camera motion
+      if (isAutoDemoActive) {
+        lon += 0.08; // Smooth 360 slow architectural rotation
+      }
 
       // Smooth Optical Zoom Inertia
       if (Math.abs(camera.fov - targetFov) > 0.05) {
