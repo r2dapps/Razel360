@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-neutral-950 text-slate-100 antialiased select-none">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LUMINA 360 | Luxury Architectural Showcase</title>
+  
+  <!-- Architectural Typography (Plus Jakarta Sans & Outfit) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+    /* Monochromatic Grayish Glassmorphism (No loud saturated colors) */
+    .glass-frosted {
+      background: rgba(18, 22, 32, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+    }
+    .glass-button {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-button:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    /* Subtle Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 20, 30, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+  </style>
+</head>
+
+<body class="h-full w-full bg-neutral-950 text-slate-100 overflow-hidden relative">
+
+  <!-- ==================== 1. FULLSCREEN 3D WEBGL VIEWPORT ==================== -->
+  <div id="canvas-container" class="fixed inset-0 w-full h-full bg-neutral-950 z-0"></div>
+
+  <!-- Camera Walk & Room Fade Transition Curtain -->
+  <div id="transition-curtain" class="fixed inset-0 bg-neutral-950 opacity-0 pointer-events-none z-40 transition-opacity duration-300"></div>
+
+  <!-- Cardboard VR Center Split Line -->
+  <div id="cardboard-divider" class="hidden fixed top-0 bottom-0 left-1/2 w-0.5 bg-neutral-800 z-40 pointer-events-none -translate-x-1/2"></div>
+
+  <!-- ==================== 2. PERMANENT LUXURY NAVIGATION CROSSHAIR ==================== -->
+  <div id="crosshair-reticle" class="fixed inset-0 m-auto w-10 h-10 pointer-events-none z-30 flex items-center justify-center transition-all duration-150">
+    <!-- Targeting Crosshair Notches -->
+    <div class="absolute w-2.5 h-[1.5px] -left-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute w-2.5 h-[1.5px] -right-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute h-2.5 w-[1.5px] -top-1.5 bg-white/70 rounded-full"></div>
+    <div class="absolute h-2.5 w-[1.5px] -bottom-1.5 bg-white/70 rounded-full"></div>
+    
+    <!-- Center Dot -->
+    <div id="reticle-dot" class="w-1.5 h-1.5 bg-white rounded-full shadow-lg transition-transform duration-150"></div>
+    
+    <!-- Dwell Progress Ring for Gaze Teleportation -->
+    <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
+      <path id="dwell-ring" class="text-white/90 transition-all duration-75" stroke-dasharray="100" stroke-dashoffset="100" stroke-width="2.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+    </svg>
+  </div>
+
+  <!-- Placement Instruction Banner (In Editor Mode) -->
+  <div id="placement-alert" class="hidden fixed top-20 left-1/2 -translate-x-1/2 glass-frosted px-5 py-2.5 rounded-full shadow-2xl z-30 flex items-center space-x-3 border border-white/20">
+    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+    <span id="placement-alert-text" class="text-xs font-semibold text-slate-200">Click on any object to attach a 3D Callout Tag</span>
+    <button onclick="cancelPlacement()" class="text-slate-400 hover:text-white text-xs ml-2 underline">Cancel</button>
+  </div>
+
+  <!-- ==================== 3. TOP NAVIGATION BAR ==================== -->
+  <header class="fixed top-0 left-0 right-0 h-16 px-4 md:px-6 flex items-center justify-between z-20 pointer-events-none">
+    
+    <!-- Left: Brand Logo & Property Tour Switcher -->
+    <div class="flex items-center space-x-3 pointer-events-auto">
+      <div class="flex items-center space-x-2.5 glass-frosted px-3.5 py-2 rounded-xl">
+        <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold border border-white/15">
+          <i class="fa-solid fa-cube text-[11px]"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-xs tracking-wider uppercase text-white">LUMINA 360</span>
+          <p class="text-[9px] text-slate-400 font-medium">Virtual Showcase</p>
+        </div>
+      </div>
+
+      <!-- Property Switcher Modal Button -->
+      <button onclick="openTourPickerModal()" class="glass-button text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-lg">
+        <i class="fa-solid fa-building text-slate-400 text-xs"></i>
+        <span id="header-tour-name" class="font-display tracking-wide max-w-[140px] md:max-w-[200px] truncate">Villa Lumina</span>
+        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+      </button>
+    </div>
+
+    <!-- Center: Active Room Title Indicator -->
+    <div class="hidden md:flex items-center pointer-events-auto">
+      <div class="glass-frosted px-4 py-1.5 rounded-full flex items-center space-x-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse"></span>
+        <span class="text-[11px] font-medium text-slate-400" id="header-room-step">Room 1 of 6:</span>
+        <span class="text-xs font-bold text-white tracking-wide font-display" id="header-room-title">Villa Facade & Pool</span>
+      </div>
+    </div>
+
+    <!-- Right: Studio Toggle, VR, Gyro & Fullscreen -->
+    <div class="flex items-center space-x-2 pointer-events-auto">
+      
+      <!-- Studio / Edit Mode Switcher Button -->
+      <button id="btn-toggle-editor" onclick="toggleEditorDrawer()" class="glass-button text-slate-300 hover:text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-sliders text-xs"></i>
+        <span id="editor-btn-label">Tour Studio</span>
+      </button>
+
+      <!-- Cardboard VR Toggle -->
+      <button id="btn-cardboard" onclick="toggleCardboardVR()" class="glass-button text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-vr-cardboard text-xs"></i>
+        <span class="hidden sm:inline" id="cardboard-btn-label">VR Mode</span>
+      </button>
+
+      <!-- Gyroscope Tilt Toggle (Mobile) -->
+      <button id="btn-gyro" onclick="toggleGyroscope()" class="glass-button text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+        <i class="fa-solid fa-compass text-xs"></i>
+        <span class="hidden md:inline" id="gyro-btn-label">Tilt</span>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button onclick="toggleFullscreen()" class="glass-button text-slate-300 hover:text-white p-2 rounded-xl text-xs w-9 h-9 flex items-center justify-center" title="Toggle Fullscreen">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 4. BOTTOM STREET VIEW DOCK & CAROUSEL ==================== -->
+  <div class="fixed bottom-4 left-0 right-0 flex flex-col items-center justify-center space-y-2 z-20 pointer-events-none px-4">
+    
+    <!-- Street View Quick Room Strip -->
+    <div id="room-strip" class="pointer-events-auto glass-frosted p-1.5 rounded-2xl flex items-center space-x-1.5 overflow-x-auto max-w-full shadow-2xl transition-all duration-300">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Street View Navigation Dock: Optical Zoom, Gallery & Visualizer Info -->
+    <div class="pointer-events-auto flex items-center space-x-2">
+      
+      <!-- Optical Zoom Controls (Google Street View Style) -->
+      <div class="glass-frosted px-2 py-1 rounded-xl flex items-center space-x-1 shadow-lg">
+        <button onclick="zoomStep(-1)" class="w-7 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom Out (-)">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <button onclick="resetZoom()" class="px-2 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-[11px] font-mono font-bold" id="zoom-level-text" title="Reset Zoom">
+          100%
+        </button>
+        <button onclick="zoomStep(1)" class="w-7 h-7 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center transition text-xs" title="Zoom In (+)">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Quick Room Gallery Button -->
+      <button onclick="toggleSceneGalleryModal()" class="glass-button text-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-lg">
+        <i class="fa-solid fa-layer-group text-xs"></i>
+        <span>All Rooms (<span id="dock-room-count">6</span>)</span>
+      </button>
+
+      <!-- 3D Visualizer Render Guidelines Button -->
+      <button onclick="openDesignGuidelinesModal()" class="glass-button text-slate-400 hover:text-white p-2 rounded-xl text-xs w-8 h-8 flex items-center justify-center" title="360 Image Render Specs For Designers">
+        <i class="fa-solid fa-circle-info"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 5. SLIDE-OUT STUDIO DRAWER (EDITOR) ==================== -->
+  <aside id="editor-drawer" class="fixed top-16 bottom-4 left-4 w-96 max-w-[calc(100vw-32px)] glass-frosted rounded-2xl z-30 flex flex-col transition-all duration-300 -translate-x-[115%] shadow-2xl overflow-hidden">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-black/30">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs text-white">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold font-display text-white">Tour Studio</h2>
+          <p class="text-[10px] text-slate-400">Configure Rooms & Hotspots</p>
+        </div>
+      </div>
+      <button onclick="toggleEditorDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+      
+      <!-- Upload 360 Panorama Renders -->
+      <div class="p-3.5 rounded-xl border border-dashed border-white/20 bg-white/5 text-center">
+        <label class="cursor-pointer block">
+          <i class="fa-solid fa-cloud-arrow-up text-white/80 text-xl mb-1.5"></i>
+          <p class="text-xs font-bold text-slate-200">Add 360° Panorama Renders</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Equirectangular 2:1 ratio (JPG / PNG)</p>
+          <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageBatch(event)">
+        </label>
+      </div>
+
+      <!-- Active Tour Rooms List -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rooms in Tour</h3>
+          <span id="studio-room-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300 font-mono">6 Rooms</span>
+        </div>
+        <div id="studio-scene-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- Add Hotspots Section -->
+      <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Interactive Hotspots</h3>
+          <span id="hotspot-badge-count" class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300 font-mono">0 active</span>
+        </div>
+
+        <!-- Hotspot Type Switcher Tabs -->
+        <div class="grid grid-cols-2 gap-1.5 p-1 bg-black/50 rounded-xl border border-white/5">
+          <button id="tab-portal-btn" onclick="switchHotspotTab('portal')" class="py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow">
+            <i class="fa-solid fa-door-open text-[11px]"></i>
+            <span>Doorway</span>
+          </button>
+          <button id="tab-info-btn" onclick="switchHotspotTab('info')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-tag text-[11px]"></i>
+            <span>3D Callout</span>
+          </button>
+        </div>
+
+        <!-- Doorway Portal Settings -->
+        <div id="tab-portal-panel" class="space-y-2">
+          <p class="text-[11px] text-slate-400">Connect spot to target room:</p>
+          <select id="portal-target-select" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40"></select>
+          <button id="btn-arm-portal" onclick="armPlacement('portal')" class="w-full py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border border-white/20">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <span id="portal-btn-label">Click on Floor to Place Doorway</span>
+          </button>
+        </div>
+
+        <!-- 3D Callout Settings -->
+        <div id="tab-info-panel" class="space-y-2 hidden">
+          <div>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-1">Item Title</label>
+            <input type="text" id="info-title-input" placeholder="e.g. Minotti Italian Sectional" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-slate-400 font-semibold block mb-1">Category / Tag</label>
+              <input type="text" id="info-tag-input" placeholder="e.g. FURNITURE" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 font-semibold block mb-1">Price Badge (optional)</label>
+              <input type="text" id="info-price-input" placeholder="e.g. $18,400" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40">
+            </div>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-semibold block mb-1">Description / Material Specs</label>
+            <textarea id="info-desc-input" rows="2" placeholder="e.g. Custom Bouclé fabric, dark bronze trim, modular deep seating" class="w-full bg-white/5 border border-white/15 text-slate-100 text-xs rounded-xl p-2 outline-none focus:border-white/40 resize-none"></textarea>
+          </div>
+          <button id="btn-arm-info" onclick="armPlacement('info')" class="w-full py-2 bg-white/20 hover:bg-white/30 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2 border border-white/25">
+            <i class="fa-solid fa-tag"></i>
+            <span id="info-btn-label">Click on Object to Place Callout</span>
+          </button>
+        </div>
+
+        <!-- Hotspots in Current Room -->
+        <div class="pt-2 border-t border-white/10">
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1.5">Hotspots in this room:</div>
+          <div id="room-hotspots-editor-list" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-3 border-t border-white/10 bg-black/40 flex items-center justify-between space-x-2">
+      <button onclick="exportCurrentTourJSON()" class="flex-1 py-1.5 glass-button text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1">
+        <i class="fa-solid fa-download text-[11px]"></i> <span>Export Tour</span>
+      </button>
+      <label class="flex-1 py-1.5 glass-button text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1 cursor-pointer">
+        <i class="fa-solid fa-upload text-[11px]"></i> <span>Import Tour</span>
+        <input type="file" id="import-tour-file" accept=".json" class="hidden" onchange="importTourJSON(event)">
+      </label>
+    </div>
+  </aside>
+
+  <!-- ==================== 6. PROPERTY TOUR SELECTOR MODAL ==================== -->
+  <div id="modal-tour-picker" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <h2 class="text-lg font-bold font-display text-white">Select Property Showcase</h2>
+          <p class="text-xs text-slate-400">Switch between multi-house 360 virtual tours</p>
+        </div>
+        <button onclick="closeTourPickerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="modal-tour-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1"></div>
+
+      <div class="pt-2 flex items-center justify-between">
+        <button onclick="createNewTourPrompt()" class="px-4 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center space-x-2">
+          <i class="fa-solid fa-plus"></i>
+          <span>Create New Property Tour</span>
+        </button>
+        <button onclick="closeTourPickerModal()" class="px-4 py-2 bg-white/10 hover:bg-white/15 text-slate-300 rounded-xl text-xs font-semibold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 7. DESIGNER GUIDELINES MODAL ==================== -->
+  <div id="modal-designer-guidelines" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-2xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15">
+            <i class="fa-solid fa-camera-rotate"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold font-display text-white">360° Visualizer Render Specs</h2>
+            <p class="text-xs text-slate-400">Give these exact instructions to your 3D architectural rendering artists</p>
+          </div>
+        </div>
+        <button onclick="closeDesignGuidelinesModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-96 overflow-y-auto pr-2">
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
+          <h4 class="font-bold text-white mb-1 text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-ruler-combined text-slate-400"></i>
+            <span>1. Aspect Ratio & Dimensions (Strict 2:1)</span>
+          </h4>
+          <p>All renders MUST be rendered with a <strong>strict 2:1 aspect ratio</strong> using an <strong>Equirectangular (Spherical 360°) Camera</strong>. Recommended resolutions:</p>
+          <ul class="list-disc list-inside mt-1 space-y-0.5 text-slate-400">
+            <li><strong>Production Standard:</strong> 4096 × 2048 px (Sharp, fast mobile loading)</li>
+            <li><strong>Ultra 8K Luxury:</strong> 6144 × 3072 px or 8192 × 4096 px</li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
+          <h4 class="font-bold text-white mb-1 text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-person-walking text-slate-400"></i>
+            <span>2. Camera Height & Level Horizon</span>
+          </h4>
+          <p>Camera height must strictly mimic natural human standing eye-level: <strong>1.55m to 1.65m (5.1 – 5.4 ft)</strong> above the finished floor level. Keep camera Pitch and Roll perfectly at <strong>0 degrees</strong> to prevent dizzying tilts.</p>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
+          <h4 class="font-bold text-white mb-1 text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-sliders text-slate-400"></i>
+            <span>3. Color Space & Lighting Continuity</span>
+          </h4>
+          <p>Export in <strong>sRGB color profile</strong> (PNG or high-quality JPEG). Ensure window lighting and exterior time-of-day match across adjacent rooms (e.g. living room, kitchen, and balcony share identical golden hour sky illumination).</p>
+        </div>
+      </div>
+
+      <div class="pt-2 text-right">
+        <button onclick="closeDesignGuidelinesModal()" class="px-5 py-2 glass-button hover:bg-white/20 text-white font-bold rounded-xl text-xs">
+          Dismiss
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 8. ROOM GALLERY MODAL ==================== -->
+  <div id="modal-scene-gallery" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-frosted w-full max-w-3xl rounded-3xl p-6 border border-white/15 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <h2 class="text-lg font-bold font-display text-white">Residence Floor Navigation</h2>
+          <p class="text-xs text-slate-400">Click any room to navigate directly</p>
+        </div>
+        <button onclick="toggleSceneGalleryModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div id="gallery-cards-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 9. APPLICATION CORE LOGIC ==================== -->
+  <script>
+    // ---------- MULTI-TOUR DATA SCHEMA (LUXURY ARCHITECTURAL PROPERTIES) ----------
+    const DEMO_VILLA_LUMINA = {
+      id: 'tour_villa_lumina',
+      title: 'Villa Lumina | Modern Residence',
+      location: 'Bel Air Crest, Beverly Hills, CA',
+      price: '$14,500,000',
+      heroImage: './assets/demo/exterior.jpg',
+      scenes: [
+        {
+          id: 'scene_exterior',
+          name: 'Villa Facade & Pool',
+          imageSrc: './assets/demo/exterior.jpg',
+          hotspots: [
+            { id: 'hs_ext_to_living', type: 'portal', targetSceneId: 'scene_living', x: 160, y: -45, z: -360 },
+            { 
+              id: 'callout_pool', 
+              type: 'info', 
+              title: 'Negative-Edge Reflection Pool', 
+              tag: 'EXTERIOR FEATURE',
+              price: '$280,000', 
+              description: 'Architectural heated saltwater pool with honed basalt coping and flush concealed skimmers.', 
+              x: 80, y: -130, z: -350 
+            },
+            { 
+              id: 'callout_facade', 
+              type: 'info', 
+              title: 'Cedar Cladding & Architectural Concrete', 
+              tag: 'FACADE ARCHITECTURE',
+              price: 'Bespoke', 
+              description: 'Board-formed post-tensioned architectural concrete paired with Japanese Shou Sugi Ban cedar.', 
+              x: -240, y: 70, z: -310 
+            }
+          ]
+        },
+        {
+          id: 'scene_living',
+          name: 'Grand Living Room',
+          imageSrc: './assets/demo/living_room.jpg',
+          hotspots: [
+            { id: 'hs_living_to_ext', type: 'portal', targetSceneId: 'scene_exterior', x: -380, y: -30, z: -100 },
+            { id: 'hs_living_to_kit', type: 'portal', targetSceneId: 'scene_kitchen', x: -320, y: -40, z: -230 },
+            { id: 'hs_living_to_balcony', type: 'portal', targetSceneId: 'scene_balcony', x: 260, y: -35, z: -290 },
+            {
+              id: 'callout_sofa',
+              type: 'info',
+              title: 'Minotti Freeman Sectional',
+              tag: 'FURNITURE',
+              price: '$18,400',
+              description: 'Custom textured bouclé wool upholstery with dark bronze perimeter structure and down cushions.',
+              x: -120, y: -110, z: -340
+            },
+            {
+              id: 'callout_fireplace',
+              type: 'info',
+              title: 'Bookmatched Calacatta Hearth',
+              tag: 'STONE ARCHITECTURE',
+              price: '$34,000',
+              description: 'Floor-to-ceiling Italian Calacatta marble slab with clean-burning linear ethanol hearth.',
+              x: 290, y: 30, z: -270
+            }
+          ]
+        },
+        {
+          id: 'scene_kitchen',
+          name: 'Chef Kitchen & Island',
+          imageSrc: './assets/demo/kitchen.jpg',
+          hotspots: [
+            { id: 'hs_kit_to_living', type: 'portal', targetSceneId: 'scene_living', x: -280, y: -45, z: -270 },
+            { id: 'hs_kit_to_balcony', type: 'portal', targetSceneId: 'scene_balcony', x: 30, y: -40, z: -390 },
+            {
+              id: 'callout_island',
+              type: 'info',
+              title: 'Calacatta Quartzite Waterfall Island',
+              tag: 'CHEF KITCHEN',
+              price: '$24,500',
+              description: '14ft monolithic marble island with integrated induction cooktop and downdraft ventilation.',
+              x: -20, y: -90, z: -380
+            },
+            {
+              id: 'callout_wine_cooler',
+              type: 'info',
+              title: 'Sub-Zero Dual Zone Wine Cellar',
+              tag: 'APPLIANCE',
+              price: '$8,200',
+              description: '102-bottle capacity with UV-resistant glass door and independent dual climate zones.',
+              x: 260, y: -50, z: -300
+            }
+          ]
+        },
+        {
+          id: 'scene_bedroom',
+          name: 'Primary Master Suite',
+          imageSrc: './assets/demo/bedroom.jpg',
+          hotspots: [
+            { id: 'hs_bed_to_living', type: 'portal', targetSceneId: 'scene_living', x: -350, y: -50, z: 170 },
+            { id: 'hs_bed_to_bath', type: 'portal', targetSceneId: 'scene_bathroom', x: 340, y: -40, z: 180 },
+            { id: 'hs_bed_to_balcony', type: 'portal', targetSceneId: 'scene_balcony', x: -260, y: -30, z: -300 },
+            {
+              id: 'callout_bed',
+              type: 'info',
+              title: 'B&B Italia Tufty Bed Suite',
+              tag: 'BEDROOM SUITE',
+              price: '$12,600',
+              description: 'Low-profile solid walnut platform bed upholstered in cashmere blend fabric.',
+              x: 140, y: -70, z: -360
+            },
+            {
+              id: 'callout_wood_wall',
+              type: 'info',
+              title: 'Acoustic Slatted White Oak Wall',
+              tag: 'MILLWORK',
+              price: 'Bespoke',
+              description: 'Sound-dampening fluted oak slats with concealed ambient cove dimmable LED channels.',
+              x: 330, y: 40, z: -210
+            }
+          ]
+        },
+        {
+          id: 'scene_bathroom',
+          name: 'Spa Bathroom & Tub',
+          imageSrc: './assets/demo/bathroom.jpg',
+          hotspots: [
+            { id: 'hs_bath_to_bed', type: 'portal', targetSceneId: 'scene_bedroom', x: 320, y: -40, z: 230 },
+            {
+              id: 'callout_tub',
+              type: 'info',
+              title: 'Nero Marquina Monolithic Stone Tub',
+              tag: 'SPA BATHROOM',
+              price: '$15,800',
+              description: 'Hand-carved solid black granite stone soaking tub with floor-mounted Dornbracht faucet.',
+              x: -180, y: -80, z: -340
+            },
+            {
+              id: 'callout_vanity',
+              type: 'info',
+              title: 'Dual Floating Vanities with Backlit Mirrors',
+              tag: 'MILLWORK & STONE',
+              price: '$11,400',
+              description: 'Honed marble vanity shelf with twin stone vessel sinks and defogging halo LED mirrors.',
+              x: 230, y: 10, z: -320
+            }
+          ]
+        },
+        {
+          id: 'scene_balcony',
+          name: 'Sunset Sky Terrace',
+          imageSrc: './assets/demo/balcony.jpg',
+          hotspots: [
+            { id: 'hs_balcony_to_living', type: 'portal', targetSceneId: 'scene_living', x: 310, y: -35, z: 240 },
+            { id: 'hs_balcony_to_bed', type: 'portal', targetSceneId: 'scene_bedroom', x: 350, y: -40, z: -170 },
+            {
+              id: 'callout_fire_table',
+              type: 'info',
+              title: 'Linear Concrete Gas Fire Table',
+              tag: 'OUTDOOR LIVING',
+              price: '$6,200',
+              description: 'Cast architectural concrete table with integrated electronic spark glass flame ribbon.',
+              x: 20, y: -130, z: -370
+            },
+            {
+              id: 'callout_teak_chairs',
+              type: 'info',
+              title: 'Roda Teak Outdoor Club Armchairs',
+              tag: 'TERRACE FURNITURE',
+              price: '$7,400',
+              description: 'Marine-grade Indonesian teak frame with quick-dry reticulated foam outdoor cushions.',
+              x: 230, y: -90, z: -310
+            }
+          ]
+        }
+      ]
+    };
+
+    // ---------- GLOBAL STATE ----------
+    let appState = {
+      tours: [DEMO_VILLA_LUMINA],
+      activeTourId: 'tour_villa_lumina',
+      activeSceneId: 'scene_exterior'
+    };
+
+    let isEditorOpen = false;
+    let isPlacementArmed = false;
+    let placementType = 'portal'; // 'portal' | 'info'
+    let isCardboardVR = false;
+    let isGyroActive = false;
+
+    // Three.js Core
+    let scene, camera, renderer, sphereMesh;
+    let portalMeshes = [];
+    let infoHotspotMeshes = [];
+    let lon = 0, lat = 0, phi = 0, theta = 0;
+    let isDragging = false, dragStartX = 0, dragStartY = 0, dragStartLon = 0, dragStartLat = 0;
+
+    // Optical Zooming (Google Street View smooth FOV)
+    let currentFov = 75;
+    let targetFov = 75;
+
+    // Gaze Dwell Reticle for VR
+    let targetedPortal = null;
+    let dwellStartTime = 0;
+    const DWELL_TIMEOUT_MS = 1400;
+
+    // Gyroscope
+    let deviceOrientation = { alpha: 0, beta: 0, gamma: 0 };
+
+    // ---------- INITIALIZATION ----------
+    window.onload = function() {
+      initThreeEngine();
+      loadAppStorage();
+      bindWindowResize();
+      renderAllUI();
+      requestAnimationFrame(renderLoop);
+    };
+
+    function initThreeEngine() {
+      const container = document.getElementById('canvas-container');
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(currentFov, window.innerWidth / window.innerHeight, 0.1, 1500);
+      camera.target = new THREE.Vector3(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Fixed sRGB gamma pipeline for true architectural colors
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      container.appendChild(renderer.domElement);
+
+      // Inverted 360 Panorama Sphere
+      const sphereGeo = new THREE.SphereGeometry(500, 64, 48);
+      sphereGeo.scale(-1, 1, 1);
+      
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0a0f1d, toneMapped: false });
+      sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      scene.add(sphereMesh);
+
+      // Mouse & Touch Drag Listeners
+      const dom = renderer.domElement;
+      dom.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      dom.addEventListener('wheel', onMouseWheel, { passive: false });
+      dom.addEventListener('click', onCanvasClick);
+      dom.addEventListener('dblclick', onCanvasDoubleClick);
+    }
+
+    function bindWindowResize() {
+      window.addEventListener('resize', onWindowResize);
+      const observer = new ResizeObserver(() => onWindowResize());
+      observer.observe(document.getElementById('canvas-container'));
+    }
+
+    function onWindowResize() {
+      if (!renderer || !camera) return;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    // ---------- SCENE LOADING & TRANSITIONS ----------
+    function getActiveTour() {
+      return appState.tours.find(t => t.id === appState.activeTourId) || appState.tours[0];
+    }
+
+    function getActiveScene() {
+      const tour = getActiveTour();
+      return tour.scenes.find(s => s.id === appState.activeSceneId) || tour.scenes[0];
+    }
+
+    function switchScene(sceneId, isWalkThrough = false) {
+      const tour = getActiveTour();
+      const targetScene = tour.scenes.find(s => s.id === sceneId);
+      if (!targetScene) return;
+
+      const performSwap = () => {
+        appState.activeSceneId = sceneId;
+
+        const loader = new THREE.TextureLoader();
+        loader.load(targetScene.imageSrc, (texture) => {
+          texture.encoding = THREE.sRGBEncoding;
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          sphereMesh.material.map = texture;
+          sphereMesh.material.color.setHex(0xffffff);
+          sphereMesh.material.needsUpdate = true;
+        });
+
+        rebuildHotspotMeshes();
+        renderAllUI();
+
+        if (isWalkThrough) {
+          document.getElementById('transition-curtain').style.opacity = '0';
+        }
+      };
+
+      if (isWalkThrough) {
+        document.getElementById('transition-curtain').style.opacity = '0.9';
+        setTimeout(performSwap, 250);
+      } else {
+        performSwap();
+      }
+    }
+
+    // ---------- 2X RETINA DYNAMIC CANVAS CALLOUT TEXTURE GENERATOR ----------
+    // Frosted graphite/charcoal card with subtle silver borders (NO loud blues or greens)
+    function createLuxuryCalloutTexture(item) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      const cardX = 36;
+      const cardY = 32;
+      const cardW = 952;
+      const cardH = 430;
+      const radius = 32;
+
+      // 1. Frosted Graphite Glass Card Background
+      ctx.fillStyle = 'rgba(16, 20, 30, 0.92)';
+      roundRect(ctx, cardX, cardY, cardW, cardH, radius);
+      ctx.fill();
+
+      // 2. Crisp Subtle Platinum Border Highlight
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.20)';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // 3. Category / Tag Pill (Top Left)
+      const tagText = (item.tag || 'INTERIOR ARCHITECTURE').toUpperCase();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
+      roundRect(ctx, cardX + 44, cardY + 44, 300, 48, 14);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(tagText, cardX + 194, cardY + 68);
+
+      // 4. Price Badge Pill (Top Right, Monochromatic Luxury Glass)
+      if (item.price && item.price.trim().length > 0) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+        roundRect(ctx, cardX + cardW - 240, cardY + 44, 196, 50, 14);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 28px "Outfit", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.price.trim(), cardX + cardW - 142, cardY + 68);
+      }
+
+      // 5. Item Title (Large, Bold Architectural Font)
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 44px "Outfit", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(truncateText(ctx, item.title || 'Featured Detail', 860), cardX + 44, cardY + 165);
+
+      // 6. Hairline Divider
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cardX + 44, cardY + 200);
+      ctx.lineTo(cardX + cardW - 44, cardY + 200);
+      ctx.stroke();
+
+      // 7. Description / Specs Text
+      if (item.description && item.description.trim()) {
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '30px "Plus Jakarta Sans", sans-serif';
+        ctx.textBaseline = 'alphabetic';
+        wrapText(ctx, item.description, cardX + 44, cardY + 265, 860, 44, 3);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.encoding = THREE.sRGBEncoding;
+      return texture;
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y, width, height, radius);
+      } else {
+        ctx.rect(x, y, width, height);
+      }
+    }
+
+    function truncateText(ctx, text, maxWidth) {
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let str = text;
+      while (str.length > 0 && ctx.measureText(str + '...').width > maxWidth) {
+        str = str.slice(0, -1);
+      }
+      return str + '...';
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+      const words = text.split(' ');
+      let line = '';
+      let curY = y;
+      let lines = 0;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+          ctx.fillText(line, x, curY);
+          line = words[n] + ' ';
+          curY += lineHeight;
+          lines++;
+          if (lines >= maxLines - 1 && n < words.length - 1) {
+            let lastLine = line;
+            for (let k = n + 1; k < words.length; k++) lastLine += words[k] + ' ';
+            while (lastLine.length > 0 && ctx.measureText(lastLine + '...').width > maxWidth) {
+              lastLine = lastLine.slice(0, -1);
+            }
+            ctx.fillText(lastLine + '...', x, curY);
+            return;
+          }
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, curY);
+    }
+
+    // ---------- 3D HOTSPOTS ENGINE (BEACONS & ARROW LEADER LINE POPUPS) ----------
+    function rebuildHotspotMeshes() {
+      // Clear Portals
+      portalMeshes.forEach(m => scene.remove(m));
+      portalMeshes = [];
+
+      // Clear Callout Billboard meshes & dispose textures
+      infoHotspotMeshes.forEach(m => {
+        if (m.userData.card && m.userData.card.material && m.userData.card.material.map) {
+          m.userData.card.material.map.dispose();
+        }
+        scene.remove(m);
+      });
+      infoHotspotMeshes = [];
+
+      const current = getActiveScene();
+      if (!current || !current.hotspots) return;
+
+      current.hotspots.forEach(hs => {
+        if (hs.type === 'info') {
+          create3DCalloutMesh(hs);
+        } else {
+          create3DPortalMesh(hs);
+        }
+      });
+    }
+
+    function create3DPortalMesh(hs) {
+      const portalGroup = new THREE.Group();
+
+      // Outer Street View Ring (White/Silver Translucent)
+      const ringGeo = new THREE.RingGeometry(18, 24, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.80
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2;
+      portalGroup.add(ringMesh);
+
+      // Direction Chevron
+      const arrowGeo = new THREE.ConeGeometry(8, 16, 4);
+      const arrowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+      const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
+      arrowMesh.rotation.x = Math.PI / 2;
+      portalGroup.add(arrowMesh);
+
+      portalGroup.position.set(hs.x, hs.y, hs.z);
+      portalGroup.lookAt(0, 0, 0);
+
+      portalGroup.userData = { id: hs.id, type: 'portal', targetSceneId: hs.targetSceneId };
+      scene.add(portalGroup);
+      portalMeshes.push(portalGroup);
+    }
+
+    function create3DCalloutMesh(hs) {
+      const group = new THREE.Group();
+      group.position.set(hs.x, hs.y, hs.z);
+
+      // 1. Center Metallic Beacon Pin (Sits on item surface)
+      const beaconGeo = new THREE.SphereGeometry(5, 16, 16);
+      const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+      group.add(beacon);
+
+      // 2. Pulse Ring
+      const pulseGeo = new THREE.RingGeometry(6, 10, 32);
+      const pulseMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.75
+      });
+      const pulseRing = new THREE.Mesh(pulseGeo, pulseMat);
+      group.add(pulseRing);
+
+      // 3. Leader Line Stem (Animates upward from beacon when crosshair hovers)
+      const STEM_MAX_HEIGHT = 34;
+      const stemGeo = new THREE.CylinderGeometry(0.7, 0.7, STEM_MAX_HEIGHT, 8);
+      stemGeo.translate(0, STEM_MAX_HEIGHT / 2, 0); // Pivot at base (0,0,0)
+      const stemMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0
+      });
+      const stemMesh = new THREE.Mesh(stemGeo, stemMat);
+      stemMesh.scale.set(1, 0, 1); // Initially collapsed at height 0
+      group.add(stemMesh);
+
+      // 4. Arrowhead pointing up at top of stem
+      const arrowGeo = new THREE.ConeGeometry(3, 6, 8);
+      arrowGeo.translate(0, 3, 0);
+      const arrowMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0
+      });
+      const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
+      arrowMesh.position.set(0, 0, 0);
+      arrowMesh.scale.set(0, 0, 0);
+      group.add(arrowMesh);
+
+      // 5. Forgiving Invisible Hit Box for Gaze/Mouse Raycasting
+      const hitGeo = new THREE.SphereGeometry(26, 8, 8);
+      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+      const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+      group.add(hitMesh);
+
+      // 6. 2X Retina Billboard Card Plane (Large, 84x42 units, readable at any zoom)
+      const cardTexture = createLuxuryCalloutTexture(hs);
+      const cardGeo = new THREE.PlaneGeometry(84, 42);
+      const cardMat = new THREE.MeshBasicMaterial({
+        map: cardTexture,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide,
+        depthTest: false
+      });
+
+      const cardMesh = new THREE.Mesh(cardGeo, cardMat);
+      // Floats above the arrowhead tip
+      cardMesh.position.set(0, STEM_MAX_HEIGHT + 23, 0);
+      cardMesh.scale.set(0.1, 0.1, 0.1);
+      cardMesh.renderOrder = 999;
+      group.add(cardMesh);
+
+      group.userData = {
+        id: hs.id,
+        type: 'info',
+        beacon: beacon,
+        pulseRing: pulseRing,
+        stem: stemMesh,
+        arrow: arrowMesh,
+        stemMaxHeight: STEM_MAX_HEIGHT,
+        hitBox: hitMesh,
+        card: cardMesh,
+        animProgress: 0.0 // 0 = closed, 1 = fully open
+      };
+
+      scene.add(group);
+      infoHotspotMeshes.push(group);
+    }
+
+    // ---------- CROSSHAIR & HOVER ANIMATION LOOP ----------
+    function checkHotspotHover() {
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+      let activeCallout = null;
+      if (infoHotspotMeshes.length > 0) {
+        const hitTargets = infoHotspotMeshes.map(g => g.userData.hitBox);
+        const hits = raycaster.intersectObjects(hitTargets);
+        if (hits.length > 0) {
+          activeCallout = hits[0].object.parent;
+        }
+      }
+
+      // Billboard orientation and Arrow-Stem-then-Card Animation
+      infoHotspotMeshes.forEach(group => {
+        const card = group.userData.card;
+        const pulse = group.userData.pulseRing;
+        const stem = group.userData.stem;
+        const arrow = group.userData.arrow;
+        const maxH = group.userData.stemMaxHeight;
+
+        // Billboarding: Always face camera
+        card.lookAt(camera.position);
+        pulse.lookAt(camera.position);
+        stem.lookAt(camera.position);
+        arrow.lookAt(camera.position);
+
+        const isTargeted = (group === activeCallout);
+
+        // Smooth animation progress interpolation
+        if (isTargeted) {
+          group.userData.animProgress = THREE.MathUtils.lerp(group.userData.animProgress, 1.0, 0.20);
+        } else {
+          group.userData.animProgress = THREE.MathUtils.lerp(group.userData.animProgress, 0.0, 0.16);
+        }
+
+        const t = group.userData.animProgress;
+
+        // Stage 1 (0 to 0.45): Stem draws upward from beacon pin
+        const stemProgress = Math.min(1.0, t / 0.45);
+        stem.scale.set(1, stemProgress, 1);
+        stem.material.opacity = stemProgress * 0.9;
+
+        // Arrow head ascends with top of stem
+        const curHeight = maxH * stemProgress;
+        arrow.position.set(0, curHeight, 0);
+        arrow.scale.set(stemProgress, stemProgress, stemProgress);
+        arrow.material.opacity = stemProgress;
+
+        // Stage 2 (0.4 to 1.0): Card pops open at tip of arrow with spring ease-out
+        const cardProgress = Math.max(0.0, (t - 0.4) / 0.6);
+        
+        // Dynamically scale card slightly with FOV so it remains ultra-readable at all zoom levels
+        const zoomCompensation = (camera.fov / 75);
+        const baseScale = THREE.MathUtils.lerp(0.1, 1.0, cardProgress) * Math.max(0.85, zoomCompensation);
+        
+        card.scale.set(baseScale, baseScale, baseScale);
+        card.material.opacity = cardProgress;
+
+        // Pulse ring subtle feedback
+        if (isTargeted) {
+          pulse.scale.lerp(new THREE.Vector3(1.3, 1.3, 1.3), 0.2);
+        } else {
+          pulse.scale.lerp(new THREE.Vector3(1.0, 1.0, 1.0), 0.15);
+        }
+      });
+
+      // Reticle Targeting Feedback
+      const dot = document.getElementById('reticle-dot');
+      if (dot && !targetedPortal) {
+        if (activeCallout) {
+          dot.classList.add('scale-150', 'bg-white');
+        } else {
+          dot.classList.remove('scale-150');
+        }
+      }
+
+      // Check Street View Gaze Teleportation for Portals
+      checkPortalTeleport(raycaster);
+    }
+
+    function checkPortalTeleport(raycaster) {
+      if (portalMeshes.length === 0) {
+        resetDwellTimer();
+        return;
+      }
+
+      const hits = raycaster.intersectObjects(portalMeshes, true);
+      const dwellRing = document.getElementById('dwell-ring');
+      const dot = document.getElementById('reticle-dot');
+
+      if (hits.length > 0) {
+        let root = hits[0].object;
+        while (root.parent && root.parent !== scene) root = root.parent;
+
+        const targetId = root.userData.targetSceneId;
+        if (!targetId) return;
+
+        if (targetedPortal !== targetId) {
+          targetedPortal = targetId;
+          dwellStartTime = performance.now();
+          if (dot) dot.classList.add('scale-150', 'bg-white');
+        } else {
+          const elapsed = performance.now() - dwellStartTime;
+          const progress = Math.min(elapsed / DWELL_TIMEOUT_MS, 1);
+          if (dwellRing) dwellRing.style.strokeDashoffset = 100 - (progress * 100);
+
+          if (elapsed >= DWELL_TIMEOUT_MS) {
+            resetDwellTimer();
+            switchScene(targetId, true);
+          }
+        }
+      } else {
+        resetDwellTimer();
+      }
+    }
+
+    function resetDwellTimer() {
+      targetedPortal = null;
+      dwellStartTime = 0;
+      const dwellRing = document.getElementById('dwell-ring');
+      const dot = document.getElementById('reticle-dot');
+      if (dwellRing) dwellRing.style.strokeDashoffset = 100;
+      if (dot && !infoHotspotMeshes.some(g => g.userData.animProgress > 0.1)) {
+        dot.classList.remove('scale-150');
+      }
+    }
+
+    // ---------- OPTICAL ZOOMING (STREET VIEW STYLE) ----------
+    function zoomStep(direction) {
+      targetFov = THREE.MathUtils.clamp(targetFov - direction * 15, 30, 95);
+    }
+
+    function resetZoom() {
+      targetFov = 75;
+    }
+
+    function onMouseWheel(e) {
+      e.preventDefault();
+      targetFov = THREE.MathUtils.clamp(targetFov + e.deltaY * 0.05, 30, 95);
+    }
+
+    function onCanvasDoubleClick(e) {
+      targetFov = (targetFov < 60) ? 75 : 45;
+    }
+
+    // ---------- DRAG & GYROSCOPE CONTROLS ----------
+    function onPointerDown(e) {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragStartLon = lon;
+      dragStartLat = lat;
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging || isGyroActive) return;
+      lon = (dragStartX - e.clientX) * 0.15 + dragStartLon;
+      lat = (e.clientY - dragStartY) * 0.15 + dragStartLat;
+    }
+
+    function onPointerUp() { isDragging = false; }
+
+    function toggleGyroscope() {
+      if (!isGyroActive) {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(state => {
+            if (state === 'granted') bindOrientationListener();
+            else alert("Gyroscope tilt access was denied by your browser.");
+          }).catch(console.error);
+        } else {
+          bindOrientationListener();
+        }
+      } else {
+        unbindOrientationListener();
+      }
+    }
+
+    function bindOrientationListener() {
+      window.addEventListener('deviceorientation', handleOrientationEvent, true);
+      isGyroActive = true;
+      document.getElementById('btn-gyro').classList.add('bg-white/30', 'text-white');
+      document.getElementById('gyro-btn-label').innerText = "Tilt On";
+    }
+
+    function unbindOrientationListener() {
+      window.removeEventListener('deviceorientation', handleOrientationEvent, true);
+      isGyroActive = false;
+      document.getElementById('btn-gyro').classList.remove('bg-white/30', 'text-white');
+      document.getElementById('gyro-btn-label').innerText = "Tilt";
+    }
+
+    function handleOrientationEvent(e) {
+      if (!isGyroActive) return;
+      deviceOrientation.alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+      deviceOrientation.beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
+      deviceOrientation.gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+
+      const euler = new THREE.Euler(deviceOrientation.beta, deviceOrientation.alpha, -deviceOrientation.gamma, 'YXZ');
+      camera.quaternion.setFromEuler(euler);
+      camera.quaternion.multiply(new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)));
+    }
+
+    // ---------- CARDBOARD VR STEREOSCOPIC MODE ----------
+    function toggleCardboardVR() {
+      isCardboardVR = !isCardboardVR;
+      const divider = document.getElementById('cardboard-divider');
+      const btn = document.getElementById('btn-cardboard');
+      const label = document.getElementById('cardboard-btn-label');
+
+      if (isCardboardVR) {
+        divider.classList.remove('hidden');
+        btn.classList.add('bg-white/30', 'text-white');
+        label.innerText = "Exit VR";
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        divider.classList.add('hidden');
+        btn.classList.remove('bg-white/30', 'text-white');
+        label.innerText = "VR Mode";
+        if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      }
+      onWindowResize();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // ---------- PLACEMENT & EDITOR ENGINE ----------
+    function toggleEditorDrawer() {
+      isEditorOpen = !isEditorOpen;
+      const drawer = document.getElementById('editor-drawer');
+      const btn = document.getElementById('btn-toggle-editor');
+      const label = document.getElementById('editor-btn-label');
+
+      if (isEditorOpen) {
+        drawer.classList.remove('-translate-x-[115%]');
+        btn.classList.add('bg-white/30', 'text-white');
+        label.innerText = "Close Studio";
+      } else {
+        drawer.classList.add('-translate-x-[115%]');
+        btn.classList.remove('bg-white/30', 'text-white');
+        label.innerText = "Tour Studio";
+        cancelPlacement();
+      }
+    }
+
+    function switchHotspotTab(tab) {
+      placementType = tab;
+      const pBtn = document.getElementById('tab-portal-btn');
+      const iBtn = document.getElementById('tab-info-btn');
+      const pPanel = document.getElementById('tab-portal-panel');
+      const iPanel = document.getElementById('tab-info-panel');
+
+      if (tab === 'portal') {
+        pBtn.className = "py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow";
+        iBtn.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5";
+        pPanel.classList.remove('hidden');
+        iPanel.classList.add('hidden');
+      } else {
+        iBtn.className = "py-1.5 text-xs font-bold rounded-lg bg-white/20 text-white transition flex items-center justify-center space-x-1.5 shadow";
+        pBtn.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center space-x-1.5";
+        iPanel.classList.remove('hidden');
+        pPanel.classList.add('hidden');
+      }
+      cancelPlacement();
+    }
+
+    function armPlacement(type) {
+      isPlacementArmed = !isPlacementArmed;
+      const alertBox = document.getElementById('placement-alert');
+      const alertText = document.getElementById('placement-alert-text');
+      const pBtnText = document.getElementById('portal-btn-label');
+      const iBtnText = document.getElementById('info-btn-label');
+
+      if (isPlacementArmed) {
+        alertBox.classList.remove('hidden');
+        if (placementType === 'portal') {
+          alertText.innerText = "Click on the floor or doorway to set connection portal";
+          pBtnText.innerText = "Cancel Portal Placement";
+        } else {
+          alertText.innerText = "Click on any furniture or object to attach callout tag";
+          iBtnText.innerText = "Cancel Callout Placement";
+        }
+      } else {
+        cancelPlacement();
+      }
+    }
+
+    function cancelPlacement() {
+      isPlacementArmed = false;
+      document.getElementById('placement-alert').classList.add('hidden');
+      document.getElementById('portal-btn-label').innerText = "Click on Floor to Place Doorway";
+      document.getElementById('info-btn-label').innerText = "Click on Object to Place Callout";
+    }
+
+    function onCanvasClick(e) {
+      // 1. If in placement mode, place hotspot
+      if (isPlacementArmed) {
+        const mouse = new THREE.Vector2(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          -(e.clientY / window.innerHeight) * 2 + 1
+        );
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const hits = raycaster.intersectObject(sphereMesh);
+
+        if (hits.length > 0) {
+          const point = hits[0].point.clone().normalize().multiplyScalar(400);
+          const curScene = getActiveScene();
+
+          if (placementType === 'info') {
+            const title = document.getElementById('info-title-input').value.trim() || 'Featured Detail';
+            const tag = document.getElementById('info-tag-input').value.trim() || 'FURNITURE';
+            const price = document.getElementById('info-price-input').value.trim();
+            const desc = document.getElementById('info-desc-input').value.trim();
+
+            curScene.hotspots.push({
+              id: 'info_' + Date.now(),
+              type: 'info',
+              title: title,
+              tag: tag,
+              price: price,
+              description: desc,
+              x: point.x, y: point.y, z: point.z
+            });
+          } else {
+            const targetId = document.getElementById('portal-target-select').value;
+            curScene.hotspots.push({
+              id: 'portal_' + Date.now(),
+              type: 'portal',
+              targetSceneId: targetId,
+              x: point.x, y: point.y, z: point.z
+            });
+          }
+
+          saveAppStorage();
+          rebuildHotspotMeshes();
+          renderAllUI();
+          cancelPlacement();
+        }
+        return;
+      }
+
+      // 2. Direct click interaction for Portals (in addition to gaze dwell)
+      const clickRaycaster = new THREE.Raycaster();
+      clickRaycaster.setFromCamera(new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      ), camera);
+
+      const portalHits = clickRaycaster.intersectObjects(portalMeshes, true);
+      if (portalHits.length > 0) {
+        let root = portalHits[0].object;
+        while (root.parent && root.parent !== scene) root = root.parent;
+        const targetId = root.userData.targetSceneId;
+        if (targetId) switchScene(targetId, true);
+      }
+    }
+
+    function deleteHotspot(hsId) {
+      const curScene = getActiveScene();
+      if (!curScene || !curScene.hotspots) return;
+      curScene.hotspots = curScene.hotspots.filter(h => h.id !== hsId);
+      saveAppStorage();
+      rebuildHotspotMeshes();
+      renderAllUI();
+    }
+
+    function handleImageBatch(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      const tour = getActiveTour();
+      let remaining = files.length;
+
+      files.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const newScene = {
+            id: 'scene_' + Date.now() + '_' + idx,
+            name: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") || `Room ${tour.scenes.length + 1}`,
+            imageSrc: e.target.result,
+            hotspots: []
+          };
+          tour.scenes.push(newScene);
+          remaining--;
+          if (remaining === 0) {
+            saveAppStorage();
+            renderAllUI();
+            switchScene(newScene.id);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = '';
+    }
+
+    // ---------- UI RENDERING ----------
+    function renderAllUI() {
+      const tour = getActiveTour();
+      const current = getActiveScene();
+      const sceneIndex = tour.scenes.findIndex(s => s.id === current.id);
+
+      // Header Info
+      document.getElementById('header-tour-name').innerText = tour.title;
+      document.getElementById('header-room-step').innerText = `Room ${sceneIndex + 1} of ${tour.scenes.length}:`;
+      document.getElementById('header-room-title').innerText = current.name;
+      document.getElementById('dock-room-count').innerText = tour.scenes.length;
+
+      // Bottom Street View Quick Strip
+      const stripContainer = document.getElementById('room-strip');
+      stripContainer.innerHTML = '';
+      tour.scenes.forEach(s => {
+        const isActive = s.id === current.id;
+        const btn = document.createElement('button');
+        btn.className = `flex items-center space-x-2 px-3 py-1.5 rounded-xl transition shrink-0 ${isActive ? 'bg-white/20 border border-white/40 text-white shadow-lg' : 'bg-white/5 hover:bg-white/10 border border-white/5 text-slate-300'}`;
+        btn.onclick = () => switchScene(s.id, true);
+        btn.innerHTML = `
+          <div class="w-6 h-5 rounded-md bg-cover bg-center shrink-0 border border-white/10" style="background-image: url('${s.imageSrc}')"></div>
+          <span class="text-xs font-semibold font-display truncate max-w-[110px]">${s.name}</span>
+        `;
+        stripContainer.appendChild(btn);
+      });
+
+      // Studio Room List
+      const studioList = document.getElementById('studio-scene-list');
+      studioList.innerHTML = '';
+      tour.scenes.forEach(s => {
+        const isActive = s.id === current.id;
+        const item = document.createElement('div');
+        item.className = `p-2 rounded-xl border flex items-center justify-between transition cursor-pointer ${isActive ? 'bg-white/15 border-white/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
+        item.onclick = () => switchScene(s.id);
+        item.innerHTML = `
+          <div class="flex items-center space-x-2.5 overflow-hidden">
+            <div class="w-9 h-7 rounded-lg bg-cover bg-center shrink-0 border border-white/10" style="background-image: url('${s.imageSrc}')"></div>
+            <input type="text" value="${s.name}" onclick="event.stopPropagation()" onchange="renameScene('${s.id}', this.value)" class="bg-transparent text-xs font-semibold text-slate-200 outline-none w-32 border-b border-transparent focus:border-white/40">
+          </div>
+          <button onclick="event.stopPropagation(); deleteScene('${s.id}')" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Delete room"><i class="fa-solid fa-trash text-xs"></i></button>
+        `;
+        studioList.appendChild(item);
+      });
+      document.getElementById('studio-room-count').innerText = `${tour.scenes.length} Rooms`;
+
+      // Portal Target Select Options
+      const portalSelect = document.getElementById('portal-target-select');
+      portalSelect.innerHTML = '';
+      tour.scenes.filter(s => s.id !== current.id).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        portalSelect.appendChild(opt);
+      });
+
+      // Studio Hotspots in Current Room
+      const hsList = document.getElementById('room-hotspots-editor-list');
+      const hsBadge = document.getElementById('hotspot-badge-count');
+      hsList.innerHTML = '';
+      const count = current.hotspots ? current.hotspots.length : 0;
+      hsBadge.innerText = `${count} active`;
+
+      if (count === 0) {
+        hsList.innerHTML = `<p class="text-[11px] text-slate-500 italic py-1">No hotspots placed in this room.</p>`;
+      } else {
+        current.hotspots.forEach(h => {
+          const row = document.createElement('div');
+          row.className = "flex items-center justify-between p-1.5 bg-white/5 rounded-lg border border-white/5 text-[11px]";
+          if (h.type === 'info') {
+            row.innerHTML = `
+              <div class="flex items-center space-x-1.5 truncate">
+                <i class="fa-solid fa-tag text-slate-300 text-[10px]"></i>
+                <span class="text-slate-200 font-medium truncate">${h.title}</span>
+                ${h.price ? `<span class="text-white font-bold ml-1">${h.price}</span>` : ''}
+              </div>
+              <button onclick="deleteHotspot('${h.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
+            `;
+          } else {
+            const tgt = tour.scenes.find(s => s.id === h.targetSceneId);
+            row.innerHTML = `
+              <div class="flex items-center space-x-1.5 truncate">
+                <i class="fa-solid fa-door-open text-slate-300 text-[10px]"></i>
+                <span class="text-slate-300 truncate">Doorway &rarr; <span class="text-white font-medium">${tgt ? tgt.name : 'Next Room'}</span></span>
+              </div>
+              <button onclick="deleteHotspot('${h.id}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
+            `;
+          }
+          hsList.appendChild(row);
+        });
+      }
+    }
+
+    function renameScene(id, newName) {
+      const tour = getActiveTour();
+      const sc = tour.scenes.find(s => s.id === id);
+      if (sc) {
+        sc.name = newName;
+        saveAppStorage();
+        renderAllUI();
+      }
+    }
+
+    function deleteScene(id) {
+      const tour = getActiveTour();
+      if (tour.scenes.length <= 1) {
+        alert("Each property showcase must contain at least one room.");
+        return;
+      }
+      tour.scenes = tour.scenes.filter(s => s.id !== id);
+      tour.scenes.forEach(s => s.hotspots = s.hotspots.filter(h => h.targetSceneId !== id));
+      if (appState.activeSceneId === id) switchScene(tour.scenes[0].id);
+      saveAppStorage();
+      renderAllUI();
+    }
+
+    // ---------- MULTI-TOUR MODAL MANAGEMENT ----------
+    function openTourPickerModal() {
+      const modal = document.getElementById('modal-tour-picker');
+      const grid = document.getElementById('modal-tour-cards');
+      grid.innerHTML = '';
+
+      appState.tours.forEach(t => {
+        const isActive = t.id === appState.activeTourId;
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'bg-white/20 border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
+        card.onclick = () => {
+          appState.activeTourId = t.id;
+          appState.activeSceneId = t.scenes[0].id;
+          saveAppStorage();
+          switchScene(t.scenes[0].id);
+          closeTourPickerModal();
+        };
+
+        card.innerHTML = `
+          <div>
+            <div class="h-28 w-full rounded-xl bg-cover bg-center mb-2.5 border border-white/10 shadow" style="background-image: url('${t.heroImage || (t.scenes[0] && t.scenes[0].imageSrc)}')"></div>
+            <h3 class="font-display font-bold text-sm text-white">${t.title}</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>${t.location || 'Luxury Location'}</p>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-white/10 mt-2">
+            <span class="text-xs font-bold text-white">${t.price || 'Price Upon Request'}</span>
+            <span class="text-[10px] bg-white/10 text-slate-300 px-2 py-0.5 rounded">${t.scenes.length} Rooms</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeTourPickerModal() {
+      document.getElementById('modal-tour-picker').classList.add('hidden');
+    }
+
+    function createNewTourPrompt() {
+      const title = prompt("Enter the luxury property tour title (e.g., Beverly Hills Skyline Penthouse):");
+      if (!title || !title.trim()) return;
+      const location = prompt("Enter property location / address (e.g., Manhattan, New York):") || "";
+      const price = prompt("Enter property list price (e.g., $9,800,000):") || "";
+
+      const newTour = {
+        id: 'tour_' + Date.now(),
+        title: title.trim(),
+        location: location.trim(),
+        price: price.trim(),
+        heroImage: './assets/demo/exterior.jpg',
+        scenes: [
+          {
+            id: 'scene_' + Date.now(),
+            name: 'Grand Entrance',
+            imageSrc: './assets/demo/exterior.jpg',
+            hotspots: []
+          }
+        ]
+      };
+
+      appState.tours.push(newTour);
+      appState.activeTourId = newTour.id;
+      appState.activeSceneId = newTour.scenes[0].id;
+
+      saveAppStorage();
+      switchScene(newTour.scenes[0].id);
+      closeTourPickerModal();
+      toggleEditorDrawer();
+    }
+
+    // ---------- ROOM GALLERY MODAL ----------
+    function toggleSceneGalleryModal() {
+      const modal = document.getElementById('modal-scene-gallery');
+      const grid = document.getElementById('gallery-cards-grid');
+      const isVisible = !modal.classList.contains('hidden');
+
+      if (isVisible) {
+        modal.classList.add('hidden');
+      } else {
+        grid.innerHTML = '';
+        const tour = getActiveTour();
+        tour.scenes.forEach(s => {
+          const isActive = s.id === appState.activeSceneId;
+          const card = document.createElement('div');
+          card.className = `p-2 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${isActive ? 'bg-white/20 border-white/40 shadow-xl' : 'bg-white/5 border-white/10 hover:bg-white/10'}`;
+          card.onclick = () => {
+            modal.classList.add('hidden');
+            switchScene(s.id, true);
+          };
+          card.innerHTML = `
+            <div class="h-28 w-full rounded-xl bg-cover bg-center border border-white/10 mb-2 shadow" style="background-image: url('${s.imageSrc}')"></div>
+            <div class="flex items-center justify-between px-1">
+              <span class="font-display font-bold text-xs text-white truncate">${s.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono"><i class="fa-solid fa-location-dot"></i></span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function openDesignGuidelinesModal() {
+      document.getElementById('modal-designer-guidelines').classList.remove('hidden');
+    }
+    function closeDesignGuidelinesModal() {
+      document.getElementById('modal-designer-guidelines').classList.add('hidden');
+    }
+
+    // ---------- STORAGE, IMPORT & EXPORT ----------
+    function saveAppStorage() {
+      try {
+        localStorage.setItem('lumina_360_multi_tours_data', JSON.stringify(appState));
+      } catch (e) {
+        console.warn("Storage quota limit reached (kept in active memory).");
+      }
+    }
+
+    function loadAppStorage() {
+      const raw = localStorage.getItem('lumina_360_multi_tours_data');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.tours && parsed.tours.length > 0) {
+            appState = parsed;
+          }
+        } catch (e) { console.error(e); }
+      }
+      switchScene(appState.activeSceneId);
+    }
+
+    function exportCurrentTourJSON() {
+      const tour = getActiveTour();
+      const exportData = {
+        app: "Lumina360",
+        version: "2.0",
+        exportedAt: new Date().toISOString(),
+        tour: tour
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${tour.title.toLowerCase().replace(/[^a-z0-9]/g, "_")}_tour.json`;
+      a.click();
+    }
+
+    function importTourJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          const tourData = imported.tour || imported; // Supports both wrapper format and raw tour format
+          if (tourData.scenes && Array.isArray(tourData.scenes) && tourData.scenes.length > 0) {
+            tourData.id = 'tour_' + Date.now();
+            appState.tours.push(tourData);
+            appState.activeTourId = tourData.id;
+            appState.activeSceneId = tourData.scenes[0].id;
+            saveAppStorage();
+            switchScene(tourData.scenes[0].id);
+            alert(`Tour successfully imported: "${tourData.title}" (${tourData.scenes.length} rooms)`);
+          } else {
+            alert("Import failed: Tour JSON must contain at least one valid scene.");
+          }
+        } catch (err) {
+          alert("Invalid 360 Tour JSON file format.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ---------- THREE.JS MAIN RENDER LOOP ----------
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+
+      // Smooth Optical Zoom Inertia
+      if (Math.abs(camera.fov - targetFov) > 0.05) {
+        camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, 0.15);
+        camera.updateProjectionMatrix();
+        const pct = Math.round((75 / camera.fov) * 100);
+        const zoomText = document.getElementById('zoom-level-text');
+        if (zoomText) zoomText.innerText = `${pct}%`;
+      }
+
+      // Manual rotation calculation if gyroscope is inactive
+      if (!isGyroActive) {
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+
+        const target = new THREE.Vector3();
+        target.x = 500 * Math.sin(phi) * Math.cos(theta);
+        target.y = 500 * Math.cos(phi);
+        target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(target);
+      }
+
+      // Check Crosshair Overlays & Animate Arrow Stem + Billboard Pop-ups
+      checkHotspotHover();
+
+      // Stereoscopic split-screen rendering for Cardboard VR
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      if (isCardboardVR) {
+        renderer.setScissorTest(true);
+
+        // Left Eye Viewport
+        renderer.setViewport(0, 0, w / 2, h);
+        renderer.setScissor(0, 0, w / 2, h);
+        camera.aspect = (w / 2) / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+
+        // Right Eye Viewport
+        renderer.setViewport(w / 2, 0, w / 2, h);
+        renderer.setScissor(w / 2, 0, w / 2, h);
+        camera.aspect = (w / 2) / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+
+        renderer.setScissorTest(false);
+      } else {
+        renderer.setViewport(0, 0, w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+      }
+    }
+  </script>
+</body>
+</html>

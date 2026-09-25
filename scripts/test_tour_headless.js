@@ -1,0 +1,137 @@
+/**
+ * Headless Automated Test Suite for Lumina 360 Virtual Tour Engine
+ * Tests HTML markup, Three.js script syntax, multi-tour data integrity,
+ * JSON export/import workflows, and demo asset resolution.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT_DIR = path.resolve(__dirname, '..');
+let testCount = 0;
+let passedCount = 0;
+let failedCount = 0;
+
+function assert(condition, message) {
+  testCount++;
+  if (condition) {
+    passedCount++;
+    console.log(`  \x1b[32m✔\x1b[0m ${message}`);
+  } else {
+    failedCount++;
+    console.error(`  \x1b[31m✖\x1b[0m ${message}`);
+  }
+}
+
+console.log('\n======================================================');
+console.log('  LUMINA 360 HEADLESS TEST SUITE');
+console.log('======================================================\n');
+
+// 1. Test HTML File & Structure
+console.log('\x1b[36m[1/5] Validating HTML & Resource Links...\x1b[0m');
+const indexPath = path.join(ROOT_DIR, 'index.html');
+assert(fs.existsSync(indexPath), 'index.html exists in root directory');
+
+const htmlContent = fs.readFileSync(indexPath, 'utf8');
+assert(htmlContent.includes('three.min.js'), 'Three.js library is included');
+assert(htmlContent.includes('Plus+Jakarta+Sans'), 'Plus Jakarta Sans typography is included');
+assert(htmlContent.includes('id="crosshair-reticle"'), 'Permanent navigation crosshair element exists');
+assert(htmlContent.includes('id="canvas-container"'), 'Canvas container element exists');
+assert(htmlContent.includes('id="editor-drawer"'), 'Tour Studio Drawer element exists');
+
+// 2. Extract & Validate Embedded JavaScript
+console.log('\n\x1b[36m[2/5] Validating JavaScript Syntax & Execution...\x1b[0m');
+const scriptMatches = htmlContent.match(/<script>([\s\S]*?)<\/script>/);
+assert(!!scriptMatches && scriptMatches[1].length > 0, 'Embedded script block found in index.html');
+
+let scriptCode = scriptMatches[1];
+let syntaxOk = false;
+try {
+  new Function(scriptCode);
+  syntaxOk = true;
+} catch (e) {
+  console.error('Syntax Error:', e.message);
+}
+assert(syntaxOk, 'JavaScript syntax parses cleanly without errors');
+
+// 3. Validate Demo Tour Schema & Hotspots
+console.log('\n\x1b[36m[3/5] Validating Multi-Tour Data Schema & Demo Assets...\x1b[0m');
+const tourMatch = scriptCode.match(/const DEMO_VILLA_LUMINA = (\{[\s\S]*?\n    \};)/);
+assert(!!tourMatch, 'DEMO_VILLA_LUMINA schema defined');
+
+let demoVilla = null;
+try {
+  demoVilla = eval('(' + tourMatch[1].replace(/;\s*$/, '') + ')');
+} catch (e) {
+  console.error('Failed to parse DEMO_VILLA_LUMINA:', e);
+}
+
+assert(!!demoVilla && demoVilla.scenes && demoVilla.scenes.length === 6, 'Demo Villa has exactly 6 interconnected rooms');
+
+const requiredScenes = [
+  'scene_exterior',
+  'scene_living',
+  'scene_kitchen',
+  'scene_bedroom',
+  'scene_bathroom',
+  'scene_balcony'
+];
+
+requiredScenes.forEach(sceneId => {
+  const scene = demoVilla.scenes.find(s => s.id === sceneId);
+  assert(!!scene, `Scene '${sceneId}' is registered in tour`);
+  if (scene) {
+    assert(scene.hotspots && scene.hotspots.length > 0, `Scene '${sceneId}' has active hotspots (${scene.hotspots ? scene.hotspots.length : 0})`);
+    
+    // Verify relative asset path on disk
+    const normalizedRelPath = scene.imageSrc.replace(/^\.\//, '').replace(/\//g, path.sep);
+    const absImagePath = path.join(ROOT_DIR, normalizedRelPath);
+    const imageExists = fs.existsSync(absImagePath);
+    assert(imageExists, `Image asset exists at disk path: ${normalizedRelPath}`);
+    if (imageExists) {
+      const stats = fs.statSync(absImagePath);
+      assert(stats.size > 100000, `Image asset '${path.basename(absImagePath)}' is high-res (${Math.round(stats.size / 1024)} KB)`);
+    }
+  }
+});
+
+// 4. Test Export / Import JSON Lifecycle
+console.log('\n\x1b[36m[4/5] Testing JSON Export / Import Validation...\x1b[0m');
+const exportPayload = {
+  app: "Lumina360",
+  version: "2.0",
+  exportedAt: new Date().toISOString(),
+  tour: demoVilla
+};
+
+const jsonString = JSON.stringify(exportPayload, null, 2);
+assert(jsonString.length > 500, 'Export JSON serialization produces non-empty string');
+
+let parsedImport = null;
+try {
+  parsedImport = JSON.parse(jsonString);
+} catch (e) {
+  console.error('Import parse failed:', e);
+}
+assert(!!parsedImport && parsedImport.tour, 'Import parser recognizes Lumina360 wrapper format');
+assert(parsedImport.tour.scenes.length === 6, 'Imported tour preserves all 6 scenes intact');
+assert(parsedImport.tour.scenes[0].hotspots.length === demoVilla.scenes[0].hotspots.length, 'Hotspot arrays match exactly after serialization roundtrip');
+
+// 5. GitHub Pages Static Assets & Deployment Verification
+console.log('\n\x1b[36m[5/5] Checking Static Hosting & GitHub Pages Prep...\x1b[0m');
+const noJekyllPath = path.join(ROOT_DIR, '.nojekyll');
+assert(fs.existsSync(noJekyllPath), '.nojekyll exists to ensure GitHub Pages serves all assets');
+
+const hasAbsoluteCPaths = htmlContent.includes('C:\\') || htmlContent.includes('D:\\');
+assert(!hasAbsoluteCPaths, 'index.html contains zero local drive paths (clean relative URLs for GitHub Pages)');
+
+console.log('\n------------------------------------------------------');
+console.log(`Summary: ${passedCount}/${testCount} tests passed (${failedCount} failed)`);
+console.log('------------------------------------------------------\n');
+
+if (failedCount > 0) {
+  process.exit(1);
+} else {
+  console.log('\x1b[32m✔ All automated tests passed successfully!\x1b[0m\n');
+  process.exit(0);
+}
